@@ -1,12 +1,12 @@
 /**
- * Affiliate Portal Hub - Clean Minimal Logic
+ * Affiliate Portal Hub - Clean Full-Width Stacked Cards Logic
  */
 
 let sites = [];
 let siteStatuses = {};
 let searchQuery = '';
 
-const tableBody = document.getElementById('sites-table-body');
+const cardContainer = document.getElementById('sites-card-container');
 const totalSitesEl = document.getElementById('stat-total-sites');
 const activeSitesEl = document.getElementById('stat-active-sites');
 const totalItemsEl = document.getElementById('stat-total-items');
@@ -69,7 +69,7 @@ async function fetchSiteStatus(site) {
 
 async function refreshAllSites(showLoading = true) {
   if (showLoading) {
-    tableBody.innerHTML = `<tr><td colspan="6" class="px-4 py-8 text-center text-gray-400">データ取得中...</td></tr>`;
+    cardContainer.innerHTML = `<div class="p-8 text-center text-xs text-gray-400 border border-gray-200 rounded">データ取得中...</div>`;
   }
 
   const promises = sites.map(async (site) => {
@@ -83,7 +83,7 @@ async function refreshAllSites(showLoading = true) {
   lastSyncTimeEl.textContent = `最終更新: ${now.toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit' })}`;
 
   updateStats();
-  renderTable();
+  renderCards();
 }
 
 function updateStats() {
@@ -106,7 +106,7 @@ function updateStats() {
   todayNewEl.textContent = `+${todayNew}`;
 }
 
-function renderTable() {
+function renderCards() {
   const filtered = sites.filter(site => {
     if (!searchQuery) return true;
     const q = searchQuery.toLowerCase();
@@ -116,11 +116,11 @@ function renderTable() {
   });
 
   if (filtered.length === 0) {
-    tableBody.innerHTML = `<tr><td colspan="6" class="px-4 py-8 text-center text-gray-400">該当するサイトがありません</td></tr>`;
+    cardContainer.innerHTML = `<div class="p-8 text-center text-xs text-gray-400 border border-gray-200 rounded">該当するサイトがありません</div>`;
     return;
   }
 
-  tableBody.innerHTML = filtered.map(site => {
+  cardContainer.innerHTML = filtered.map(site => {
     const st = siteStatuses[site.id];
     const isOk = st && st.status === 'operational' && st.data;
     const data = isOk ? st.data : null;
@@ -131,44 +131,78 @@ function renderTable() {
     const recentItems = (data && data.recent_items) ? data.recent_items : [];
 
     return `
-      <tr class="hover:bg-gray-50/80 transition">
-        <td class="px-4 py-3 whitespace-nowrap">
-          <span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-medium ${isOk ? 'bg-green-50 text-green-700 border border-green-200' : 'bg-red-50 text-red-700 border border-red-200'}">
-            ${isOk ? '稼働中' : 'エラー'}
-          </span>
-        </td>
-        <td class="px-4 py-3">
-          <div class="font-bold text-gray-900">${site.name}</div>
-          <div class="text-[11px] text-gray-500">${site.asp || 'DUGA'} ${site.category ? '・ ' + site.category : ''}</div>
-          ${recentItems.length > 0 ? `
-            <div class="mt-1 text-[11px] text-gray-600">
-              <span class="text-amber-700 font-medium">新着例:</span> ${recentItems[0].title.substring(0, 30)}...
+      <div class="bg-white border border-gray-200 rounded p-4 hover:border-gray-300 transition shadow-sm">
+        
+        <!-- Main Row -->
+        <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+          
+          <!-- Left: Status & Site Name -->
+          <div class="flex items-start sm:items-center gap-3 min-w-0">
+            <span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-medium whitespace-nowrap ${isOk ? 'bg-green-50 text-green-700 border border-green-200' : 'bg-red-50 text-red-700 border border-red-200'}">
+              ${isOk ? '稼働中' : 'エラー'}
+            </span>
+            <div class="min-w-0">
+              <div class="flex flex-wrap items-center gap-2">
+                <a href="${site.siteUrl}" target="_blank" rel="noopener noreferrer" class="text-sm font-bold text-gray-900 hover:text-blue-600 transition truncate">
+                  ${site.name}
+                </a>
+                <span class="text-[11px] px-2 py-0.5 bg-gray-100 text-gray-600 rounded">
+                  ${site.asp || 'DUGA'} ${site.category ? '・ ' + site.category : ''}
+                </span>
+              </div>
             </div>
-          ` : ''}
-        </td>
-        <td class="px-4 py-3 whitespace-nowrap text-gray-600 font-mono">
-          ${lastUpdated}
-        </td>
-        <td class="px-4 py-3 text-right whitespace-nowrap font-bold text-gray-900">
-          ${totalItems}
-        </td>
-        <td class="px-4 py-3 text-right whitespace-nowrap font-bold ${recentNew > 0 ? 'text-amber-600' : 'text-gray-400'}">
-          ${recentNew > 0 ? `+${recentNew}` : '0'}
-        </td>
-        <td class="px-4 py-3 text-right whitespace-nowrap space-x-2">
-          <a href="${site.siteUrl}" target="_blank" rel="noopener noreferrer" class="inline-block px-2.5 py-1 text-gray-700 bg-white border border-gray-300 rounded hover:bg-gray-50">
-            サイト開く
-          </a>
-          ${site.actionsUrl ? `
-            <a href="${site.actionsUrl}" target="_blank" rel="noopener noreferrer" class="inline-block px-2.5 py-1 text-gray-700 bg-white border border-gray-300 rounded hover:bg-gray-50">
-              ログ
-            </a>
-          ` : ''}
-          <button onclick="openEditModal('${site.id}')" class="inline-block px-2 py-1 text-gray-500 hover:text-gray-900 border border-transparent hover:border-gray-200 rounded">
-            設定
-          </button>
-        </td>
-      </tr>
+          </div>
+
+          <!-- Middle & Right: Metrics & Actions -->
+          <div class="flex flex-wrap items-center justify-between lg:justify-end gap-4 sm:gap-6 text-xs text-gray-600">
+            
+            <!-- Last Updated -->
+            <div class="whitespace-nowrap">
+              <span class="text-gray-400 block text-[10px]">最終更新</span>
+              <span class="font-mono text-gray-800">${lastUpdated}</span>
+            </div>
+
+            <!-- Total Items -->
+            <div class="whitespace-nowrap text-right">
+              <span class="text-gray-400 block text-[10px]">登録記事数</span>
+              <span class="font-bold text-gray-900 text-sm">${totalItems}</span> <span class="text-[10px] text-gray-500">件</span>
+            </div>
+
+            <!-- Today's New -->
+            <div class="whitespace-nowrap text-right">
+              <span class="text-gray-400 block text-[10px]">新着</span>
+              <span class="font-bold text-sm ${recentNew > 0 ? 'text-amber-600' : 'text-gray-400'}">${recentNew > 0 ? `+${recentNew}` : '0'}</span>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="flex items-center gap-1.5 whitespace-nowrap pl-2 border-l border-gray-100">
+              <a href="${site.siteUrl}" target="_blank" rel="noopener noreferrer" class="px-2.5 py-1 text-gray-700 bg-white border border-gray-300 rounded hover:bg-gray-50">
+                サイト開く
+              </a>
+              ${site.actionsUrl ? `
+                <a href="${site.actionsUrl}" target="_blank" rel="noopener noreferrer" class="px-2.5 py-1 text-gray-700 bg-white border border-gray-300 rounded hover:bg-gray-50">
+                  ログ
+                </a>
+              ` : ''}
+              <button onclick="openEditModal('${site.id}')" class="px-2 py-1 text-gray-400 hover:text-gray-700 rounded hover:bg-gray-100" title="設定">
+                設定
+              </button>
+            </div>
+
+          </div>
+
+        </div>
+
+        <!-- Optional Sub-Row: Recent Item Preview -->
+        ${recentItems.length > 0 ? `
+          <div class="mt-3 pt-2.5 border-t border-gray-100 text-[11px] text-gray-500 flex flex-wrap items-center gap-2">
+            <span class="text-amber-700 font-semibold bg-amber-50 px-1.5 py-0.5 rounded border border-amber-200">直近追加</span>
+            <span class="text-gray-700 font-medium truncate max-w-2xl">${recentItems[0].title}</span>
+            <span class="text-gray-400 text-[10px]">他 計${recentItems.length}件</span>
+          </div>
+        ` : ''}
+
+      </div>
     `;
   }).join('');
 }
@@ -178,7 +212,7 @@ function setupEventListeners() {
 
   searchInput.addEventListener('input', (e) => {
     searchQuery = e.target.value;
-    renderTable();
+    renderCards();
   });
 
   siteForm.addEventListener('submit', (e) => {
