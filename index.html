@@ -1,312 +1,155 @@
 <!DOCTYPE html>
-<html lang="ja" class="dark">
+<html lang="ja">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Affiliate Portal Hub ｜ アフィリエイト総合監視・管理ダッシュボード</title>
-  
-  <!-- Tailwind CSS CDN -->
+  <title>Affiliate Portal Hub</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    tailwind.config = {
-      darkMode: 'class',
-      theme: {
-        extend: {
-          colors: {
-            brand: {
-              50: '#eef2ff',
-              500: '#6366f1',
-              600: '#4f46e5',
-              700: '#4338ca',
-            }
-          }
-        }
-      }
-    }
-  </script>
-
-  <!-- Lucide Icons -->
-  <script src="https://unpkg.com/lucide@latest"></script>
-
-  <!-- Custom CSS -->
   <link rel="stylesheet" href="css/style.css">
 </head>
-<body class="min-h-screen bg-slate-950 text-slate-100 antialiased selection:bg-indigo-500 selection:text-white">
+<body class="bg-gray-50 text-gray-900 min-h-screen">
 
-  <!-- Background Glow Accents -->
-  <div class="fixed inset-0 overflow-hidden pointer-events-none z-0">
-    <div class="absolute -top-40 -left-40 w-96 h-96 bg-indigo-600/20 rounded-full blur-[128px]"></div>
-    <div class="absolute top-1/3 -right-40 w-96 h-96 bg-rose-600/15 rounded-full blur-[128px]"></div>
-    <div class="absolute -bottom-40 left-1/3 w-96 h-96 bg-emerald-600/15 rounded-full blur-[128px]"></div>
-  </div>
-
-  <div class="relative z-10 flex flex-col min-h-screen">
+  <div class="max-w-6xl mx-auto px-4 py-8">
     
-    <!-- Top Navigation -->
-    <header class="glass-panel sticky top-0 z-30 border-b border-slate-800/80">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-        <div class="flex items-center gap-3">
-          <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-rose-500 p-0.5 shadow-lg shadow-indigo-500/25">
-            <div class="w-full h-full bg-slate-950 rounded-[10px] flex items-center justify-center">
-              <i data-lucide="layout-dashboard" class="w-5 h-5 text-indigo-400"></i>
-            </div>
-          </div>
-          <div>
-            <h1 class="text-base font-extrabold text-white tracking-tight flex items-center gap-2">
-              Affiliate Portal Hub
-              <span class="text-[10px] px-2 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300 font-semibold border border-indigo-500/30">PRO</span>
-            </h1>
-            <p class="text-[11px] text-slate-400 font-medium">全アフィリエイトポータル一括稼働監視・運用管理</p>
-          </div>
-        </div>
-
-        <div class="flex items-center gap-3">
-          <span id="last-sync-time" class="text-xs text-slate-400 font-medium hidden sm:inline-block">同期中...</span>
-          
-          <button id="btn-refresh" class="p-2 text-slate-300 hover:text-white bg-slate-900 hover:bg-slate-800 rounded-xl border border-slate-800 transition" title="全サイト最新ステータスを取得">
-            <i data-lucide="refresh-cw" class="w-4 h-4"></i>
-          </button>
-
-          <div class="h-5 w-px bg-slate-800"></div>
-
-          <button onclick="openAddModal()" class="inline-flex items-center gap-1.5 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold py-2 px-3.5 rounded-xl shadow-lg shadow-indigo-600/25 transition">
-            <i data-lucide="plus-circle" class="w-4 h-4"></i>
-            <span>サイト追加</span>
-          </button>
-        </div>
+    <!-- Header -->
+    <header class="flex flex-col sm:flex-row sm:items-center justify-between pb-6 border-b border-gray-200 gap-4 mb-6">
+      <div>
+        <h1 class="text-xl font-bold text-gray-900">Affiliate Portal Hub</h1>
+        <p class="text-xs text-gray-500 mt-0.5">複数サイトの更新状況・記事数管理</p>
+      </div>
+      <div class="flex items-center gap-3">
+        <span id="last-sync-time" class="text-xs text-gray-500">同期中...</span>
+        <button id="btn-refresh" class="px-3 py-1.5 text-xs font-medium text-gray-700 bg-white border border-gray-300 rounded hover:bg-gray-50 transition">
+          更新
+        </button>
+        <button onclick="openAddModal()" class="px-3 py-1.5 text-xs font-medium text-white bg-gray-900 rounded hover:bg-gray-800 transition">
+          + サイト追加
+        </button>
       </div>
     </header>
 
-    <!-- Main Content -->
-    <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+    <!-- Summary Metrics -->
+    <section class="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-8">
+      <div class="bg-white p-4 rounded border border-gray-200 shadow-sm">
+        <div class="text-xs text-gray-500 font-medium">監視サイト数</div>
+        <div class="text-2xl font-bold text-gray-900 mt-1" id="stat-total-sites">--</div>
+      </div>
+      <div class="bg-white p-4 rounded border border-gray-200 shadow-sm">
+        <div class="text-xs text-gray-500 font-medium">正常稼働</div>
+        <div class="text-2xl font-bold text-green-600 mt-1" id="stat-active-sites">--</div>
+      </div>
+      <div class="bg-white p-4 rounded border border-gray-200 shadow-sm">
+        <div class="text-xs text-gray-500 font-medium">全登録記事数</div>
+        <div class="text-2xl font-bold text-gray-900 mt-1" id="stat-total-items">--</div>
+      </div>
+      <div class="bg-white p-4 rounded border border-gray-200 shadow-sm">
+        <div class="text-xs text-gray-500 font-medium">本日新着</div>
+        <div class="text-2xl font-bold text-gray-900 mt-1" id="stat-today-new">--</div>
+      </div>
+    </section>
 
-      <!-- Metrics Cards -->
-      <section class="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
-        
-        <!-- Total Sites -->
-        <div class="glass-panel rounded-2xl p-5 border border-slate-800/80 shadow-xl relative overflow-hidden group">
-          <div class="flex items-center justify-between mb-2">
-            <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">監視サイト数</span>
-            <div class="p-2 rounded-xl bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">
-              <i data-lucide="globe" class="w-4 h-4"></i>
-            </div>
-          </div>
-          <div class="text-3xl font-extrabold text-white tracking-tight" id="stat-total-sites">--</div>
-          <p class="text-xs text-slate-400 mt-2 flex items-center gap-1">
-            <i data-lucide="check-circle-2" class="w-3.5 h-3.5 text-emerald-400"></i>
-            <span>全ポータル登録完了</span>
-          </p>
-        </div>
+    <!-- ASP Links (Simple text shortcuts) -->
+    <div class="flex flex-wrap items-center gap-2 pb-6 text-xs text-gray-600">
+      <span class="font-medium text-gray-700">管理画面リンク:</span>
+      <a href="https://affiliate.duga.jp/" target="_blank" rel="noopener noreferrer" class="px-2.5 py-1 bg-white border border-gray-200 rounded hover:border-gray-400 transition">DUGA</a>
+      <a href="https://affiliate.dmm.com/" target="_blank" rel="noopener noreferrer" class="px-2.5 py-1 bg-white border border-gray-200 rounded hover:border-gray-400 transition">FANZA/DMM</a>
+      <a href="https://search.google.com/search-console" target="_blank" rel="noopener noreferrer" class="px-2.5 py-1 bg-white border border-gray-200 rounded hover:border-gray-400 transition">Search Console</a>
+      <a href="https://analytics.google.com/" target="_blank" rel="noopener noreferrer" class="px-2.5 py-1 bg-white border border-gray-200 rounded hover:border-gray-400 transition">Analytics</a>
+    </div>
 
-        <!-- Active Sites -->
-        <div class="glass-panel rounded-2xl p-5 border border-slate-800/80 shadow-xl relative overflow-hidden group">
-          <div class="flex items-center justify-between mb-2">
-            <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">正常稼働中</span>
-            <div class="p-2 rounded-xl bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
-              <i data-lucide="activity" class="w-4 h-4"></i>
-            </div>
-          </div>
-          <div class="text-3xl font-extrabold text-emerald-400 tracking-tight" id="stat-active-sites">--</div>
-          <p class="text-xs text-slate-400 mt-2 flex items-center gap-1">
-            <i data-lucide="shield-check" class="w-3.5 h-3.5 text-emerald-400"></i>
-            <span>自動クロール稼働中</span>
-          </p>
-        </div>
+    <!-- Sites Table -->
+    <section class="bg-white rounded border border-gray-200 shadow-sm overflow-hidden mb-8">
+      <div class="p-4 border-b border-gray-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-gray-50/50">
+        <h2 class="text-sm font-bold text-gray-900">監視サイト一覧</h2>
+        <input type="text" id="search-input" placeholder="サイト名で検索..." class="text-xs border border-gray-300 rounded px-3 py-1.5 w-full sm:w-64 bg-white focus:outline-none focus:border-gray-500">
+      </div>
 
-        <!-- Total Articles -->
-        <div class="glass-panel rounded-2xl p-5 border border-slate-800/80 shadow-xl relative overflow-hidden group">
-          <div class="flex items-center justify-between mb-2">
-            <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">全登録商品・記事数</span>
-            <div class="p-2 rounded-xl bg-purple-500/10 text-purple-400 border border-purple-500/20">
-              <i data-lucide="layers" class="w-4 h-4"></i>
-            </div>
-          </div>
-          <div class="text-3xl font-extrabold text-white tracking-tight" id="stat-total-items">--</div>
-          <p class="text-xs text-slate-400 mt-2 flex items-center gap-1">
-            <i data-lucide="trending-up" class="w-3.5 h-3.5 text-purple-400"></i>
-            <span>SEOインデックス対象</span>
-          </p>
-        </div>
-
-        <!-- Today's New Releases -->
-        <div class="glass-panel rounded-2xl p-5 border border-slate-800/80 shadow-xl relative overflow-hidden group">
-          <div class="flex items-center justify-between mb-2">
-            <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">本日新着追加</span>
-            <div class="p-2 rounded-xl bg-amber-500/10 text-amber-400 border border-amber-500/20">
-              <i data-lucide="sparkles" class="w-4 h-4"></i>
-            </div>
-          </div>
-          <div class="text-3xl font-extrabold text-amber-400 tracking-tight" id="stat-today-new">--</div>
-          <p class="text-xs text-slate-400 mt-2 flex items-center gap-1">
-            <i data-lucide="clock" class="w-3.5 h-3.5 text-amber-400"></i>
-            <span>毎朝 04:00 自動反映</span>
-          </p>
-        </div>
-
-      </section>
-
-      <!-- Quick ASP Shortcuts Bar -->
-      <section class="glass-panel rounded-2xl p-4 border border-slate-800/80 shadow-lg">
-        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-          <div class="flex items-center gap-2 text-xs font-bold text-slate-300">
-            <i data-lucide="zap" class="w-4 h-4 text-amber-400"></i>
-            <span>ASP管理・レポート クイックアクセス:</span>
-          </div>
-          <div class="flex flex-wrap items-center gap-2">
-            <a href="https://affiliate.duga.jp/" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-slate-900/90 hover:bg-slate-800 text-slate-200 text-xs font-semibold rounded-xl border border-slate-700/60 hover:border-indigo-500/40 transition">
-              <span class="w-2 h-2 rounded-full bg-rose-500"></span>
-              DUGA アフィリエイト
-            </a>
-            <a href="https://affiliate.dmm.com/" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-slate-900/90 hover:bg-slate-800 text-slate-200 text-xs font-semibold rounded-xl border border-slate-700/60 hover:border-indigo-500/40 transition">
-              <span class="w-2 h-2 rounded-full bg-blue-500"></span>
-              FANZA / DMM
-            </a>
-            <a href="https://search.google.com/search-console" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-slate-900/90 hover:bg-slate-800 text-slate-200 text-xs font-semibold rounded-xl border border-slate-700/60 hover:border-indigo-500/40 transition">
-              <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
-              Search Console
-            </a>
-            <a href="https://analytics.google.com/" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-slate-900/90 hover:bg-slate-800 text-slate-200 text-xs font-semibold rounded-xl border border-slate-700/60 hover:border-indigo-500/40 transition">
-              <span class="w-2 h-2 rounded-full bg-amber-500"></span>
-              Google Analytics
-            </a>
-          </div>
-        </div>
-      </section>
-
-      <!-- Sites Board Section -->
-      <section class="space-y-4">
-        
-        <!-- Controls & Filters Bar -->
-        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
-          
-          <!-- Category Tabs -->
-          <div class="flex items-center gap-1.5 overflow-x-auto pb-1 md:pb-0 no-scrollbar">
-            <button class="filter-btn px-3.5 py-1.5 rounded-xl text-xs font-bold bg-indigo-600 text-white transition shadow-sm" data-filter="all">すべて</button>
-            <button class="filter-btn px-3.5 py-1.5 rounded-xl text-xs font-bold bg-slate-800/80 text-slate-400 hover:text-white transition" data-filter="DUGA">DUGA</button>
-            <button class="filter-btn px-3.5 py-1.5 rounded-xl text-xs font-bold bg-slate-800/80 text-slate-400 hover:text-white transition" data-filter="FANZA">FANZA</button>
-            <button class="filter-btn px-3.5 py-1.5 rounded-xl text-xs font-bold bg-slate-800/80 text-slate-400 hover:text-white transition" data-filter="一般特化">一般特化</button>
-          </div>
-
-          <!-- Search & View Toggle -->
-          <div class="flex items-center gap-3">
-            <div class="relative flex-1 md:w-64">
-              <i data-lucide="search" class="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400"></i>
-              <input type="text" id="search-input" placeholder="サイト名やASPで絞り込み..." class="w-full bg-slate-900/90 text-xs text-slate-100 pl-9 pr-4 py-2 rounded-xl border border-slate-800 focus:outline-none focus:border-indigo-500 transition placeholder:text-slate-500">
-            </div>
-
-            <!-- View Toggle -->
-            <div class="flex items-center bg-slate-900 p-1 rounded-xl border border-slate-800">
-              <button id="view-grid-btn" class="p-1.5 rounded-lg bg-slate-800 text-white transition" title="グリッドビュー">
-                <i data-lucide="layout-grid" class="w-4 h-4"></i>
-              </button>
-              <button id="view-table-btn" class="p-1.5 rounded-lg text-slate-400 hover:text-white transition" title="テーブルビュー">
-                <i data-lucide="list" class="w-4 h-4"></i>
-              </button>
-            </div>
-          </div>
-
-        </div>
-
-        <!-- Dynamic Sites Container -->
-        <div id="sites-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          <!-- Rendered by app.js -->
-        </div>
-
-      </section>
-
-    </main>
+      <div class="overflow-x-auto">
+        <table class="w-full text-left text-xs text-gray-700">
+          <thead class="bg-gray-50 text-gray-500 font-semibold border-b border-gray-200">
+            <tr>
+              <th class="px-4 py-3">状態</th>
+              <th class="px-4 py-3">サイト名 / ASP</th>
+              <th class="px-4 py-3">最終更新日時</th>
+              <th class="px-4 py-3 text-right">総記事数</th>
+              <th class="px-4 py-3 text-right">新着</th>
+              <th class="px-4 py-3 text-right">操作</th>
+            </tr>
+          </thead>
+          <tbody id="sites-table-body" class="divide-y divide-gray-100">
+            <!-- Rendered by JS -->
+          </tbody>
+        </table>
+      </div>
+    </section>
 
     <!-- Footer -->
-    <footer class="border-t border-slate-800/80 bg-slate-950/80 py-6 mt-12">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4">
-        <div class="text-xs text-slate-500 font-medium">
-          &copy; 2026 Affiliate Portal Hub. All rights reserved.
-        </div>
-        <div class="flex items-center gap-4 text-xs">
-          <button onclick="exportConfig()" class="text-slate-400 hover:text-indigo-400 transition flex items-center gap-1">
-            <i data-lucide="download" class="w-3.5 h-3.5"></i> 設定エクスポート
-          </button>
-          <label class="text-slate-400 hover:text-indigo-400 transition cursor-pointer flex items-center gap-1">
-            <i data-lucide="upload" class="w-3.5 h-3.5"></i> 設定インポート
-            <input type="file" accept=".json" class="hidden" onchange="importConfig(event)">
-          </label>
-        </div>
+    <footer class="text-xs text-gray-400 flex items-center justify-between pt-4 border-t border-gray-200">
+      <div>&copy; 2026 Affiliate Portal Hub</div>
+      <div class="flex items-center gap-4">
+        <button onclick="exportConfig()" class="hover:text-gray-600 transition">設定エクスポート</button>
+        <label class="hover:text-gray-600 transition cursor-pointer">
+          設定インポート
+          <input type="file" accept=".json" class="hidden" onchange="importConfig(event)">
+        </label>
       </div>
     </footer>
 
   </div>
 
-  <!-- Add / Edit Site Modal -->
-  <div id="site-modal" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm hidden items-center justify-center p-4">
-    <div class="glass-panel w-full max-w-lg rounded-2xl p-6 border border-slate-700/60 shadow-2xl space-y-5 animate-in fade-in zoom-in duration-200">
-      <div class="flex items-center justify-between">
-        <h3 id="modal-title" class="text-base font-bold text-white flex items-center gap-2">
-          <i data-lucide="plus-circle" class="w-5 h-5 text-indigo-400"></i>
-          監視サイトの新規登録
-        </h3>
-        <button onclick="closeModal()" class="text-slate-400 hover:text-white p-1 rounded-lg">
-          <i data-lucide="x" class="w-5 h-5"></i>
-        </button>
+  <!-- Modal -->
+  <div id="site-modal" class="fixed inset-0 bg-black/40 hidden items-center justify-center p-4 z-50">
+    <div class="bg-white rounded-lg border border-gray-200 shadow-xl max-w-md w-full p-6 space-y-4">
+      <div class="flex items-center justify-between pb-3 border-b border-gray-200">
+        <h3 id="modal-title" class="text-sm font-bold text-gray-900">サイト設定</h3>
+        <button onclick="closeModal()" class="text-gray-400 hover:text-gray-600 text-lg leading-none">&times;</button>
       </div>
 
-      <form id="site-form" class="space-y-4">
+      <form id="site-form" class="space-y-3 text-xs">
         <input type="hidden" id="site-id">
 
         <div>
-          <label class="block text-xs font-semibold text-slate-300 mb-1">サイト名 <span class="text-rose-400">*</span></label>
-          <input type="text" id="site-name" required placeholder="例: DUGAスカトロ動画おすすめまとめポータル" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2 text-xs text-white focus:outline-none focus:border-indigo-500">
+          <label class="block font-medium text-gray-700 mb-1">サイト名</label>
+          <input type="text" id="site-name" required class="w-full border border-gray-300 rounded px-3 py-1.5 focus:outline-none focus:border-gray-500">
         </div>
 
         <div class="grid grid-cols-2 gap-3">
           <div>
-            <label class="block text-xs font-semibold text-slate-300 mb-1">ジャンル / カテゴリ</label>
-            <input type="text" id="site-category" placeholder="例: DUGA特化, FANZA特化" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2 text-xs text-white focus:outline-none focus:border-indigo-500">
+            <label class="block font-medium text-gray-700 mb-1">ASP種別</label>
+            <input type="text" id="site-asp" placeholder="例: DUGA, FANZA" class="w-full border border-gray-300 rounded px-3 py-1.5 focus:outline-none focus:border-gray-500">
           </div>
           <div>
-            <label class="block text-xs font-semibold text-slate-300 mb-1">対象ASP / アフィリエイト</label>
-            <input type="text" id="site-asp" placeholder="例: DUGA (Agent: 49313)" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2 text-xs text-white focus:outline-none focus:border-indigo-500">
+            <label class="block font-medium text-gray-700 mb-1">カテゴリ</label>
+            <input type="text" id="site-category" placeholder="例: 特化ポータル" class="w-full border border-gray-300 rounded px-3 py-1.5 focus:outline-none focus:border-gray-500">
           </div>
         </div>
 
         <div>
-          <label class="block text-xs font-semibold text-slate-300 mb-1">公開サイトURL <span class="text-rose-400">*</span></label>
-          <input type="url" id="site-url" required placeholder="https://username.github.io/site-name/" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2 text-xs text-white focus:outline-none focus:border-indigo-500">
+          <label class="block font-medium text-gray-700 mb-1">公開サイトURL</label>
+          <input type="url" id="site-url" required placeholder="https://..." class="w-full border border-gray-300 rounded px-3 py-1.5 focus:outline-none focus:border-gray-500">
         </div>
 
         <div>
-          <label class="block text-xs font-semibold text-slate-300 mb-1">status.json URL (または Raw URL) <span class="text-rose-400">*</span></label>
-          <input type="url" id="status-url" required placeholder="https://raw.githubusercontent.com/.../status.json" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2 text-xs text-white focus:outline-none focus:border-indigo-500">
+          <label class="block font-medium text-gray-700 mb-1">status.json URL</label>
+          <input type="url" id="status-url" required placeholder="https://.../status.json" class="w-full border border-gray-300 rounded px-3 py-1.5 focus:outline-none focus:border-gray-500">
         </div>
 
-        <div class="grid grid-cols-2 gap-3">
-          <div>
-            <label class="block text-xs font-semibold text-slate-300 mb-1">GitHub リポジトリURL</label>
-            <input type="url" id="repo-url" placeholder="https://github.com/user/repo" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2 text-xs text-white focus:outline-none focus:border-indigo-500">
-          </div>
-          <div>
-            <label class="block text-xs font-semibold text-slate-300 mb-1">更新スケジュール</label>
-            <input type="text" id="site-schedule" placeholder="毎日 午前4:00 (JST)" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2 text-xs text-white focus:outline-none focus:border-indigo-500">
-          </div>
+        <div>
+          <label class="block font-medium text-gray-700 mb-1">GitHub リポジトリ/Actions URL</label>
+          <input type="url" id="actions-url" placeholder="https://github.com/..." class="w-full border border-gray-300 rounded px-3 py-1.5 focus:outline-none focus:border-gray-500">
         </div>
 
-        <div class="pt-4 border-t border-slate-800 flex items-center justify-between gap-3">
-          <button type="button" id="btn-delete-site" class="text-xs font-bold text-rose-400 hover:text-rose-300 px-3 py-2 rounded-xl hover:bg-rose-500/10 transition hidden">
-            削除する
-          </button>
+        <div class="pt-3 border-t border-gray-200 flex items-center justify-between">
+          <button type="button" id="btn-delete-site" class="text-red-600 hover:underline hidden">削除</button>
           <div class="flex items-center gap-2 ml-auto">
-            <button type="button" onclick="closeModal()" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold rounded-xl transition">
-              キャンセル
-            </button>
-            <button type="submit" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold rounded-xl shadow-lg shadow-indigo-600/30 transition">
-              保存する
-            </button>
+            <button type="button" onclick="closeModal()" class="px-3 py-1.5 border border-gray-300 rounded text-gray-700 hover:bg-gray-50">キャンセル</button>
+            <button type="submit" class="px-3 py-1.5 bg-gray-900 text-white rounded hover:bg-gray-800">保存</button>
           </div>
         </div>
       </form>
     </div>
   </div>
 
-  <!-- Scripts -->
   <script src="js/sites_config.js"></script>
   <script src="js/app.js"></script>
 </body>
