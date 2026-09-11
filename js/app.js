@@ -9,7 +9,7 @@ let searchQuery = '';
 const cardContainer = document.getElementById('sites-card-container');
 const totalSitesEl = document.getElementById('stat-total-sites');
 const activeSitesEl = document.getElementById('stat-active-sites');
-const totalItemsEl = document.getElementById('stat-total-items');
+const errorSitesEl = document.getElementById('stat-error-sites');
 const todayNewEl = document.getElementById('stat-today-new');
 const lastSyncTimeEl = document.getElementById('last-sync-time');
 const refreshBtn = document.getElementById('btn-refresh');
@@ -89,20 +89,29 @@ async function refreshAllSites(showLoading = true) {
 function updateStats() {
   totalSitesEl.textContent = sites.length;
   let activeCount = 0;
-  let totalItems = 0;
+  let errorCount = 0;
   let todayNew = 0;
 
   sites.forEach(site => {
     const st = siteStatuses[site.id];
     if (st && st.status === 'operational' && st.data) {
       activeCount++;
-      totalItems += (st.data.total_items || 0);
       todayNew += (st.data.recent_new_count || 0);
+    } else if (st && st.status === 'error') {
+      errorCount++;
     }
   });
 
   activeSitesEl.textContent = `${activeCount} / ${sites.length}`;
-  totalItemsEl.textContent = totalItems.toLocaleString();
+  
+  if (errorCount > 0) {
+    errorSitesEl.textContent = `${errorCount}件`;
+    errorSitesEl.className = "text-2xl font-bold text-red-600 mt-1";
+  } else {
+    errorSitesEl.textContent = "0件";
+    errorSitesEl.className = "text-2xl font-bold text-gray-900 mt-1";
+  }
+
   todayNewEl.textContent = `+${todayNew}`;
 }
 
