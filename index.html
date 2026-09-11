@@ -5,9 +5,15 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Affiliate Portal Hub</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="stylesheet" href="css/style.css">
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      background-color: #ffffff;
+      color: #111827;
+    }
+  </style>
 </head>
-<body class="bg-gray-50 text-gray-900 min-h-screen">
+<body class="bg-white text-gray-900 min-h-screen">
 
   <div class="max-w-6xl mx-auto px-4 py-8">
     
@@ -30,26 +36,26 @@
 
     <!-- Summary Metrics -->
     <section class="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-8">
-      <div class="bg-white p-4 rounded border border-gray-200 shadow-sm">
+      <div class="bg-white p-4 rounded border border-gray-200">
         <div class="text-xs text-gray-500 font-medium">監視サイト数</div>
         <div class="text-2xl font-bold text-gray-900 mt-1" id="stat-total-sites">--</div>
       </div>
-      <div class="bg-white p-4 rounded border border-gray-200 shadow-sm">
+      <div class="bg-white p-4 rounded border border-gray-200">
         <div class="text-xs text-gray-500 font-medium">正常稼働</div>
         <div class="text-2xl font-bold text-green-600 mt-1" id="stat-active-sites">--</div>
       </div>
-      <div class="bg-white p-4 rounded border border-gray-200 shadow-sm">
+      <div class="bg-white p-4 rounded border border-gray-200">
         <div class="text-xs text-gray-500 font-medium">全登録記事数</div>
         <div class="text-2xl font-bold text-gray-900 mt-1" id="stat-total-items">--</div>
       </div>
-      <div class="bg-white p-4 rounded border border-gray-200 shadow-sm">
+      <div class="bg-white p-4 rounded border border-gray-200">
         <div class="text-xs text-gray-500 font-medium">本日新着</div>
         <div class="text-2xl font-bold text-gray-900 mt-1" id="stat-today-new">--</div>
       </div>
     </section>
 
-    <!-- ASP Links (Simple text shortcuts) -->
-    <div class="flex flex-wrap items-center gap-2 pb-6 text-xs text-gray-600">
+    <!-- ASP Links -->
+    <div class="flex flex-wrap items-center gap-2 pb-6 text-xs text-gray-600 border-b border-gray-100 mb-6">
       <span class="font-medium text-gray-700">管理画面リンク:</span>
       <a href="https://affiliate.duga.jp/" target="_blank" rel="noopener noreferrer" class="px-2.5 py-1 bg-white border border-gray-200 rounded hover:border-gray-400 transition">DUGA</a>
       <a href="https://affiliate.dmm.com/" target="_blank" rel="noopener noreferrer" class="px-2.5 py-1 bg-white border border-gray-200 rounded hover:border-gray-400 transition">FANZA/DMM</a>
@@ -57,16 +63,16 @@
       <a href="https://analytics.google.com/" target="_blank" rel="noopener noreferrer" class="px-2.5 py-1 bg-white border border-gray-200 rounded hover:border-gray-400 transition">Analytics</a>
     </div>
 
-    <!-- Sites Table -->
-    <section class="bg-white rounded border border-gray-200 shadow-sm overflow-hidden mb-8">
-      <div class="p-4 border-b border-gray-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-gray-50/50">
+    <!-- Sites Table Section -->
+    <section class="bg-white rounded border border-gray-200 overflow-hidden mb-8">
+      <div class="p-4 border-b border-gray-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white">
         <h2 class="text-sm font-bold text-gray-900">監視サイト一覧</h2>
         <input type="text" id="search-input" placeholder="サイト名で検索..." class="text-xs border border-gray-300 rounded px-3 py-1.5 w-full sm:w-64 bg-white focus:outline-none focus:border-gray-500">
       </div>
 
       <div class="overflow-x-auto">
         <table class="w-full text-left text-xs text-gray-700">
-          <thead class="bg-gray-50 text-gray-500 font-semibold border-b border-gray-200">
+          <thead class="bg-white text-gray-500 font-semibold border-b border-gray-200">
             <tr>
               <th class="px-4 py-3">状態</th>
               <th class="px-4 py-3">サイト名 / ASP</th>
@@ -98,8 +104,8 @@
   </div>
 
   <!-- Modal -->
-  <div id="site-modal" class="fixed inset-0 bg-black/40 hidden items-center justify-center p-4 z-50">
-    <div class="bg-white rounded-lg border border-gray-200 shadow-xl max-w-md w-full p-6 space-y-4">
+  <div id="site-modal" class="fixed inset-0 bg-black/30 hidden items-center justify-center p-4 z-50">
+    <div class="bg-white rounded-lg border border-gray-300 shadow-lg max-w-md w-full p-6 space-y-4">
       <div class="flex items-center justify-between pb-3 border-b border-gray-200">
         <h3 id="modal-title" class="text-sm font-bold text-gray-900">サイト設定</h3>
         <button onclick="closeModal()" class="text-gray-400 hover:text-gray-600 text-lg leading-none">&times;</button>
