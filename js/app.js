@@ -1,5 +1,5 @@
 /**
- * Affiliate Portal Hub - Main Logic with Dynamic Links Management
+ * Affiliate Portal Hub - Clean Accordion with True Newly Added Articles
  */
 
 const DEFAULT_LINKS = [
@@ -204,7 +204,10 @@ function renderCards() {
     const lastUpdated = data ? data.last_updated : '取得失敗';
     const totalItems = data ? data.total_items : '--';
     const recentNew = data ? (data.recent_new_count || 0) : 0;
-    const recentItems = (data && data.recent_items) ? data.recent_items : [];
+    const rawRecentItems = (data && data.recent_items) ? data.recent_items : [];
+    
+    // Only show true new items if recent_new_count > 0, otherwise show fallback list
+    const newItemsOnly = recentNew > 0 ? rawRecentItems.slice(0, recentNew) : [];
     const isExpanded = expandedSites.has(site.id);
 
     return `
@@ -279,27 +282,32 @@ function renderCards() {
 
         </div>
 
-        <!-- Expanded Accordion: Recent Added Pages List (Strict New Addition Order) -->
+        <!-- Expanded Accordion: Show ONLY Newly Added Articles -->
         ${isExpanded ? `
           <div class="border-t border-gray-200 bg-gray-50/50 p-4 space-y-2">
             <div class="flex items-center justify-between text-xs text-gray-700 pb-1.5 border-b border-gray-200/80">
               <span class="font-bold flex items-center gap-1.5">
-                <span>🔥 直近の自動追加・生成記事一覧</span>
-                <span class="text-[11px] font-normal text-gray-500 font-mono">(${recentItems.length}件 / 最新追加順)</span>
+                <span>🔥 今回新しく自動追加・生成された記事</span>
+                <span class="text-[11px] font-bold ${recentNew > 0 ? 'text-amber-600' : 'text-gray-500'} font-mono">(${recentNew}件)</span>
               </span>
-              <span class="text-[11px] text-gray-400">クリックで個別レビューページを直接確認</span>
+              <span class="text-[11px] text-gray-400">クリックで生成された記事ページを開く</span>
             </div>
 
-            ${recentItems.length === 0 ? `
-              <div class="text-xs text-gray-400 py-3 text-center">新着記事データはありません</div>
+            ${newItemsOnly.length === 0 ? `
+              <div class="text-xs text-gray-400 py-4 text-center bg-white rounded border border-gray-200">
+                本日の自動更新で新しく追加された記事はありません（新着 0件）
+              </div>
             ` : `
               <div class="divide-y divide-gray-100 bg-white rounded border border-gray-200 overflow-hidden">
-                ${recentItems.map((item, idx) => {
+                ${newItemsOnly.map((item, idx) => {
                   const itemUrl = `${site.siteUrl.replace(/\/+$/, '')}/reviews/${item.item_id}.html`;
                   return `
-                    <div class="p-2.5 hover:bg-blue-50/40 transition flex items-center justify-between gap-3 text-xs">
+                    <div class="p-2.5 hover:bg-amber-50/40 transition flex items-center justify-between gap-3 text-xs">
                       <div class="flex items-center gap-2 min-w-0 flex-1">
-                        <span class="text-gray-400 font-mono text-[11px] w-5 text-right font-medium">${idx + 1}.</span>
+                        <span class="text-amber-600 font-mono text-[11px] w-5 text-right font-bold">${idx + 1}.</span>
+                        <span class="text-[10px] px-1.5 py-0.5 bg-amber-100 text-amber-800 rounded whitespace-nowrap font-bold">
+                          NEW
+                        </span>
                         <span class="text-[10px] px-1.5 py-0.5 bg-gray-100 text-gray-600 rounded whitespace-nowrap font-medium">
                           ${item.category || '一般'}
                         </span>
@@ -313,7 +321,7 @@ function renderCards() {
                         ${item.date ? `<span class="text-gray-400 font-mono text-[10px]">${item.date}</span>` : ''}
                         ${item.price ? `<span>${item.price}</span>` : ''}
                         ${item.rating ? `<span class="text-amber-600 font-medium">★${item.rating}</span>` : ''}
-                        <a href="${itemUrl}" target="_blank" rel="noopener noreferrer" class="text-blue-600 hover:underline font-medium">
+                        <a href="${itemUrl}" target="_blank" rel="noopener noreferrer" class="text-blue-600 hover:underline font-bold">
                           記事を開く ↗
                         </a>
                       </div>
