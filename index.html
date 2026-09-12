@@ -172,17 +172,17 @@
         </div>
 
         <div>
-          <label class="block font-medium text-gray-700 mb-1">公開サイトURL</label>
-          <input type="url" id="site-url" required placeholder="https://..." class="w-full border border-gray-300 rounded px-3 py-1.5 focus:outline-none focus:border-gray-500">
+          <label class="block font-medium text-gray-700 mb-1">公開サイトURL <span class="text-gray-400 font-normal">（貼り付けると下段も自動補完されます）</span></label>
+          <input type="url" id="site-url" required placeholder="https://your-portal.pages.dev" class="w-full border border-gray-300 rounded px-3 py-1.5 focus:outline-none focus:border-gray-500">
         </div>
 
         <div>
-          <label class="block font-medium text-gray-700 mb-1">status.json URL</label>
-          <input type="url" id="status-url" required placeholder="https://.../status.json" class="w-full border border-gray-300 rounded px-3 py-1.5 focus:outline-none focus:border-gray-500">
+          <label class="block font-medium text-gray-700 mb-1">status.json URL <span class="text-blue-600 font-normal">（自動入力）</span></label>
+          <input type="url" id="status-url" required placeholder="https://your-portal.pages.dev/status.json" class="w-full border border-gray-300 rounded px-3 py-1.5 focus:outline-none focus:border-gray-500 bg-gray-50/50">
         </div>
 
         <div>
-          <label class="block font-medium text-gray-700 mb-1">GitHub リポジトリ/Actions URL</label>
+          <label class="block font-medium text-gray-700 mb-1">GitHub リポジトリ/Actions URL <span class="text-gray-400 font-normal">（任意）</span></label>
           <input type="url" id="actions-url" placeholder="https://github.com/..." class="w-full border border-gray-300 rounded px-3 py-1.5 focus:outline-none focus:border-gray-500">
         </div>
 
@@ -197,8 +197,8 @@
     </div>
   </div>
 
-  <script src="js/sites_config.js?v=5"></script>
-  <script src="js/app.js?v=5"></script>
+  <script src="js/sites_config.js?v=6"></script>
+  <script src="js/app.js?v=6"></script>
   <script>
     function copyText(elementId) {
       const text = document.getElementById(elementId).innerText;

@@ -271,6 +271,24 @@ function setupEventListeners() {
     renderCards();
   });
 
+  // Auto-fill status.json URL when site URL is entered
+  siteUrlInput.addEventListener('input', (e) => {
+    const rawUrl = e.target.value.trim();
+    if (rawUrl) {
+      const cleanUrl = rawUrl.replace(/\/+$/, '');
+      if (!statusUrlInput.value || statusUrlInput.dataset.autoFilled === 'true') {
+        statusUrlInput.value = `${cleanUrl}/status.json`;
+        statusUrlInput.dataset.autoFilled = 'true';
+      }
+    } else if (statusUrlInput.dataset.autoFilled === 'true') {
+      statusUrlInput.value = '';
+    }
+  });
+
+  statusUrlInput.addEventListener('input', () => {
+    statusUrlInput.dataset.autoFilled = 'false';
+  });
+
   siteForm.addEventListener('submit', (e) => {
     e.preventDefault();
     const id = siteIdInput.value.trim() || 'site-' + Date.now();
@@ -311,6 +329,7 @@ function openAddModal() {
   modalTitle.textContent = 'サイト追加';
   siteForm.reset();
   siteIdInput.value = '';
+  statusUrlInput.dataset.autoFilled = 'true';
   deleteSiteBtn.classList.add('hidden');
   siteModal.classList.remove('hidden');
   siteModal.classList.add('flex');
@@ -325,6 +344,7 @@ function openEditModal(siteId) {
   siteNameInput.value = site.name;
   siteUrlInput.value = site.siteUrl;
   statusUrlInput.value = site.statusUrl;
+  statusUrlInput.dataset.autoFilled = 'false';
   actionsUrlInput.value = site.actionsUrl || '';
   categoryInput.value = site.category || '';
   aspInput.value = site.asp || '';
