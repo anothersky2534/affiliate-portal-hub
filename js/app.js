@@ -1,5 +1,5 @@
 /**
- * Affiliate Portal Hub - Clean 2-Row Card Layout
+ * Affiliate Portal Hub - Clean 2-Row Card Layout (Articles & New above Action Buttons)
  */
 
 let sites = [];
@@ -156,20 +156,58 @@ function renderCards() {
         <!-- Header / Card Area (Clickable) -->
         <div onclick="toggleExpand('${site.id}')" class="p-4 cursor-pointer hover:bg-gray-50/70 transition space-y-2.5 select-none">
           
-          <!-- Row 1: Status Badge, Full Title, and Action Buttons on the right -->
+          <!-- Row 1: Left (Badge + Title) | Right (Total Articles + New Count + Arrow) -->
           <div class="flex items-center justify-between gap-4">
             
             <div class="flex items-center gap-2.5 min-w-0 flex-1">
               <span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-medium whitespace-nowrap ${isOk ? 'bg-green-50 text-green-700 border border-green-200' : 'bg-red-50 text-red-700 border border-red-200'}">
                 ${isOk ? '稼働中' : 'エラー'}
               </span>
-              <h3 class="text-sm sm:text-base font-bold text-gray-900 leading-snug">
+              <h3 class="text-sm sm:text-base font-bold text-gray-900 leading-snug truncate">
                 ${site.name}
               </h3>
             </div>
 
-            <!-- Right: Action Buttons & Expand Icon -->
-            <div class="flex items-center gap-1.5 whitespace-nowrap" onclick="event.stopPropagation()">
+            <!-- Right Top: Total Articles & New Count (Positioned above Action buttons) -->
+            <div class="flex items-center gap-4 text-xs whitespace-nowrap">
+              <div class="flex items-center gap-1.5">
+                <span class="text-gray-400 text-[11px]">記事数:</span>
+                <span class="font-bold text-gray-900 text-sm">${totalItems}</span>
+                <span class="text-gray-400 text-[11px]">件</span>
+              </div>
+
+              <div class="flex items-center gap-1.5">
+                <span class="text-gray-400 text-[11px]">新着:</span>
+                <span class="font-bold text-sm ${recentNew > 0 ? 'text-amber-600' : 'text-gray-400'}">${recentNew > 0 ? `+${recentNew}件` : '0件'}</span>
+              </div>
+
+              <div class="text-gray-400 text-xs pl-1">
+                ${isExpanded ? '▲' : '▼'}
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Row 2: Left (ASP/ID + Last Updated) | Right (Action Buttons: Open / Log / Setting) -->
+          <div class="flex flex-wrap items-center justify-between gap-x-4 gap-y-2 text-xs text-gray-500 pt-0.5 border-t border-gray-100 sm:border-0 sm:pt-0">
+            
+            <!-- Left Sub: ASP/ID & Last Updated -->
+            <div class="flex flex-wrap items-center gap-x-5 gap-y-1">
+              <div class="flex items-center gap-1.5">
+                <span class="text-gray-400 text-[11px]">ASP / ID:</span>
+                <span class="px-2 py-0.5 bg-gray-100 text-gray-700 rounded font-medium text-[11px]">
+                  ${site.asp || 'DUGA'}
+                </span>
+              </div>
+
+              <div class="flex items-center gap-1.5">
+                <span class="text-gray-400 text-[11px]">最終更新:</span>
+                <span class="font-mono text-gray-800 font-medium">${lastUpdated}</span>
+              </div>
+            </div>
+
+            <!-- Right Sub: Action Buttons (Placed directly below Articles & New) -->
+            <div class="flex items-center gap-1.5 whitespace-nowrap ml-auto" onclick="event.stopPropagation()">
               <a href="${site.siteUrl}" target="_blank" rel="noopener noreferrer" class="px-2.5 py-1 text-gray-700 bg-white border border-gray-300 rounded hover:bg-gray-50 text-xs font-medium">
                 サイトを開く
               </a>
@@ -181,41 +219,6 @@ function renderCards() {
               <button onclick="openEditModal('${site.id}')" class="px-2 py-1 text-gray-400 hover:text-gray-700 text-xs rounded hover:bg-gray-100" title="設定">
                 設定
               </button>
-              <div class="text-gray-400 text-xs pl-1">
-                ${isExpanded ? '▲' : '▼'}
-              </div>
-            </div>
-
-          </div>
-
-          <!-- Row 2: Agent ID / ASP, Last Updated, Article Count, New Count -->
-          <div class="flex flex-wrap items-center gap-x-6 gap-y-1 text-xs text-gray-500 pt-0.5">
-            
-            <!-- ASP / Agent ID -->
-            <div class="flex items-center gap-1.5">
-              <span class="text-gray-400 text-[11px]">ASP / ID:</span>
-              <span class="px-2 py-0.5 bg-gray-100 text-gray-700 rounded font-medium text-[11px]">
-                ${site.asp || 'DUGA'}
-              </span>
-            </div>
-
-            <!-- Last Updated -->
-            <div class="flex items-center gap-1.5">
-              <span class="text-gray-400 text-[11px]">最終更新:</span>
-              <span class="font-mono text-gray-800 font-medium">${lastUpdated}</span>
-            </div>
-
-            <!-- Total Articles -->
-            <div class="flex items-center gap-1.5">
-              <span class="text-gray-400 text-[11px]">記事数:</span>
-              <span class="font-bold text-gray-900">${totalItems}</span>
-              <span class="text-gray-400 text-[11px]">件</span>
-            </div>
-
-            <!-- New Articles -->
-            <div class="flex items-center gap-1.5">
-              <span class="text-gray-400 text-[11px]">新着:</span>
-              <span class="font-bold ${recentNew > 0 ? 'text-amber-600' : 'text-gray-400'}">${recentNew > 0 ? `+${recentNew}件` : '0件'}</span>
             </div>
 
           </div>
