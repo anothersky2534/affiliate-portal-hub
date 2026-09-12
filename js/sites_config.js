@@ -13,6 +13,18 @@ const DEFAULT_SITES = [
     actionsUrl: "https://github.com/anothersky2534/duga-scat-portal/actions",
     schedule: "毎日 午前4:00 (JST)",
     tags: ["DUGA", "スカトロ", "自動更新", "Cloudflare Pages"]
+  },
+  {
+    id: "fc2-ranking-and-review",
+    name: "FC2売れ筋ランキング＆徹底レビューまとめ",
+    category: "FC2ランキング",
+    asp: "FC2",
+    siteUrl: "https://fc2-ranking-and-review.anothersky2534.workers.dev/",
+    statusUrl: "https://fc2-ranking-and-review.anothersky2534.workers.dev/status.json",
+    repoUrl: "",
+    actionsUrl: "",
+    schedule: "定期更新",
+    tags: ["FC2", "ランキング", "Cloudflare Workers"]
   }
 ];
 
