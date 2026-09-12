@@ -1,10 +1,11 @@
 /**
- * Affiliate Portal Hub - Clean Full-Width Stacked Cards Logic
+ * Affiliate Portal Hub - Accordion Cards Logic
  */
 
 let sites = [];
 let siteStatuses = {};
 let searchQuery = '';
+let expandedSites = new Set(); // Stores expanded site IDs
 
 const cardContainer = document.getElementById('sites-card-container');
 const totalSitesEl = document.getElementById('stat-total-sites');
@@ -115,6 +116,15 @@ function updateStats() {
   todayNewEl.textContent = `+${todayNew}`;
 }
 
+function toggleExpand(siteId) {
+  if (expandedSites.has(siteId)) {
+    expandedSites.delete(siteId);
+  } else {
+    expandedSites.add(siteId);
+  }
+  renderCards();
+}
+
 function renderCards() {
   const filtered = sites.filter(site => {
     if (!searchQuery) return true;
@@ -138,12 +148,13 @@ function renderCards() {
     const totalItems = data ? data.total_items : '--';
     const recentNew = data ? (data.recent_new_count || 0) : 0;
     const recentItems = (data && data.recent_items) ? data.recent_items : [];
+    const isExpanded = expandedSites.has(site.id);
 
     return `
-      <div class="bg-white border border-gray-200 rounded p-4 hover:border-gray-300 transition shadow-sm">
+      <div class="bg-white border ${isExpanded ? 'border-gray-400 shadow-sm' : 'border-gray-200'} rounded overflow-hidden transition">
         
-        <!-- Main Row -->
-        <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+        <!-- Header / Card Row (Clickable) -->
+        <div onclick="toggleExpand('${site.id}')" class="p-4 cursor-pointer hover:bg-gray-50/70 transition flex flex-col sm:flex-row sm:items-center justify-between gap-3 select-none">
           
           <!-- Left: Status & Site Name -->
           <div class="flex items-start sm:items-center gap-3 min-w-0">
@@ -152,62 +163,96 @@ function renderCards() {
             </span>
             <div class="min-w-0">
               <div class="flex flex-wrap items-center gap-2">
-                <a href="${site.siteUrl}" target="_blank" rel="noopener noreferrer" class="text-sm font-bold text-gray-900 hover:text-blue-600 transition truncate">
+                <span class="text-sm font-bold text-gray-900 truncate">
                   ${site.name}
-                </a>
-                <span class="text-[11px] px-2 py-0.5 bg-gray-100 text-gray-600 rounded">
+                </span>
+                <span class="text-[11px] px-1.5 py-0.5 bg-gray-100 text-gray-600 rounded">
                   ${site.asp || 'DUGA'} ${site.category ? '・ ' + site.category : ''}
                 </span>
               </div>
             </div>
           </div>
 
-          <!-- Middle & Right: Metrics & Actions -->
-          <div class="flex flex-wrap items-center justify-between lg:justify-end gap-4 sm:gap-6 text-xs text-gray-600">
+          <!-- Right: Metrics & Actions -->
+          <div class="flex items-center justify-between sm:justify-end gap-3 sm:gap-5 text-xs text-gray-600">
             
-            <!-- Last Updated -->
-            <div class="whitespace-nowrap">
-              <span class="text-gray-400 block text-[10px]">最終更新</span>
-              <span class="font-mono text-gray-800">${lastUpdated}</span>
-            </div>
-
-            <!-- Total Items -->
             <div class="whitespace-nowrap text-right">
-              <span class="text-gray-400 block text-[10px]">登録記事数</span>
-              <span class="font-bold text-gray-900 text-sm">${totalItems}</span> <span class="text-[10px] text-gray-500">件</span>
+              <span class="text-gray-400 block text-[10px]">更新</span>
+              <span class="font-mono text-gray-700">${lastUpdated ? lastUpdated.split(' ')[1] || lastUpdated : '--'}</span>
             </div>
 
-            <!-- Today's New -->
+            <div class="whitespace-nowrap text-right">
+              <span class="text-gray-400 block text-[10px]">総記事数</span>
+              <span class="font-bold text-gray-900">${totalItems}</span> <span class="text-[10px] text-gray-500">件</span>
+            </div>
+
             <div class="whitespace-nowrap text-right">
               <span class="text-gray-400 block text-[10px]">新着</span>
-              <span class="font-bold text-sm ${recentNew > 0 ? 'text-amber-600' : 'text-gray-400'}">${recentNew > 0 ? `+${recentNew}` : '0'}</span>
+              <span class="font-bold ${recentNew > 0 ? 'text-amber-600' : 'text-gray-400'}">${recentNew > 0 ? `+${recentNew}` : '0'}</span>
             </div>
 
-            <!-- Action Buttons -->
-            <div class="flex items-center gap-1.5 whitespace-nowrap pl-2 border-l border-gray-100">
-              <a href="${site.siteUrl}" target="_blank" rel="noopener noreferrer" class="px-2.5 py-1 text-gray-700 bg-white border border-gray-300 rounded hover:bg-gray-50">
-                サイト開く
+            <!-- Action Buttons (Stop propagation so they don't toggle accordion) -->
+            <div class="flex items-center gap-1.5 whitespace-nowrap pl-2 border-l border-gray-100" onclick="event.stopPropagation()">
+              <a href="${site.siteUrl}" target="_blank" rel="noopener noreferrer" class="px-2.5 py-1 text-gray-700 bg-white border border-gray-300 rounded hover:bg-gray-50 text-xs">
+                開く
               </a>
               ${site.actionsUrl ? `
-                <a href="${site.actionsUrl}" target="_blank" rel="noopener noreferrer" class="px-2.5 py-1 text-gray-700 bg-white border border-gray-300 rounded hover:bg-gray-50">
+                <a href="${site.actionsUrl}" target="_blank" rel="noopener noreferrer" class="px-2.5 py-1 text-gray-700 bg-white border border-gray-300 rounded hover:bg-gray-50 text-xs">
                   ログ
                 </a>
               ` : ''}
-              <button onclick="openEditModal('${site.id}')" class="px-2 py-1 text-gray-400 hover:text-gray-700 rounded hover:bg-gray-100" title="設定">
+              <button onclick="openEditModal('${site.id}')" class="px-2 py-1 text-gray-400 hover:text-gray-700 rounded hover:bg-gray-100 text-xs" title="設定">
                 設定
               </button>
+            </div>
+
+            <!-- Expand Toggle Icon -->
+            <div class="text-gray-400 text-xs pl-1">
+              ${isExpanded ? '▲' : '▼'}
             </div>
 
           </div>
 
         </div>
 
-        <!-- Optional Sub-Row: Recent Item Preview -->
-        ${recentItems.length > 0 ? `
-          <div class="mt-3 pt-2.5 border-t border-gray-100 text-[11px] text-gray-500 flex flex-wrap items-center gap-2">
-            <span class="text-amber-700 font-semibold bg-amber-50 px-1.5 py-0.5 rounded border border-amber-200">直近追加</span>
-            <span class="text-gray-700 font-medium truncate max-w-2xl">${recentItems[0].title}</span>
-            <span class="text-gray-400 text-[10px]">他 計${recentItems.length}件</span>
+        <!-- Expanded Accordion: Recent Added Pages List -->
+        ${isExpanded ? `
+          <div class="border-t border-gray-200 bg-gray-50/50 p-4 space-y-3">
+            <div class="flex items-center justify-between text-xs font-bold text-gray-700 pb-2 border-b border-gray-200/80">
+              <span>📋 直近で追加・更新されたページ一覧 (${recentItems.length}件)</span>
+              <span class="text-[11px] font-normal text-gray-500">クリックで各記事ページを直接確認</span>
+            </div>
+
+            ${recentItems.length === 0 ? `
+              <div class="text-xs text-gray-400 py-3 text-center">新着記事データはありません</div>
+            ` : `
+              <div class="divide-y divide-gray-200/60 bg-white rounded border border-gray-200">
+                ${recentItems.map((item, idx) => {
+                  const itemUrl = `${site.siteUrl.replace(/\/+$/, '')}/reviews/${item.item_id}.html`;
+                  return `
+                    <div class="p-2.5 hover:bg-blue-50/40 transition flex items-center justify-between gap-3 text-xs">
+                      <div class="flex items-center gap-2 min-w-0 flex-1">
+                        <span class="text-gray-400 font-mono text-[11px] w-5 text-right">${idx + 1}.</span>
+                        <span class="text-[10px] px-1.5 py-0.5 bg-gray-100 text-gray-600 rounded whitespace-nowrap font-medium">
+                          ${item.category || '一般'}
+                        </span>
+                        <a href="${itemUrl}" target="_blank" rel="noopener noreferrer" class="font-medium text-gray-900 hover:text-blue-600 truncate">
+                          ${item.title}
+                        </a>
+                      </div>
+
+                      <div class="flex items-center gap-3 whitespace-nowrap text-gray-500 text-[11px]">
+                        ${item.price ? `<span>${item.price}</span>` : ''}
+                        ${item.rating ? `<span class="text-amber-600 font-medium">★${item.rating}</span>` : ''}
+                        <a href="${itemUrl}" target="_blank" rel="noopener noreferrer" class="text-blue-600 hover:underline font-medium">
+                          記事を開く ↗
+                        </a>
+                      </div>
+                    </div>
+                  `;
+                }).join('')}
+              </div>
+            `}
           </div>
         ` : ''}
 

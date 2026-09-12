@@ -15,7 +15,7 @@
 </head>
 <body class="bg-white text-gray-900 min-h-screen">
 
-  <div class="w-full px-4 sm:px-8 py-8">
+  <div class="max-w-4xl mx-auto px-4 sm:px-6 py-8">
     
     <!-- Header -->
     <header class="flex flex-col sm:flex-row sm:items-center justify-between pb-6 border-b border-gray-200 gap-4 mb-6">
@@ -34,28 +34,28 @@
       </div>
     </header>
 
-    <!-- Summary Metrics (Wide Layout) -->
-    <section class="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
-      <div class="bg-white p-4 rounded border border-gray-200">
+    <!-- Summary Metrics -->
+    <section class="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 mb-6">
+      <div class="bg-white p-3.5 rounded border border-gray-200">
         <div class="text-xs text-gray-500 font-medium">監視サイト数</div>
         <div class="text-2xl font-bold text-gray-900 mt-1" id="stat-total-sites">--</div>
       </div>
-      <div class="bg-white p-4 rounded border border-gray-200">
+      <div class="bg-white p-3.5 rounded border border-gray-200">
         <div class="text-xs text-gray-500 font-medium">正常稼働</div>
         <div class="text-2xl font-bold text-green-600 mt-1" id="stat-active-sites">--</div>
       </div>
-      <div class="bg-white p-4 rounded border border-gray-200">
+      <div class="bg-white p-3.5 rounded border border-gray-200">
         <div class="text-xs text-gray-500 font-medium">エラー発生</div>
         <div class="text-2xl font-bold text-gray-900 mt-1" id="stat-error-sites">--</div>
       </div>
-      <div class="bg-white p-4 rounded border border-gray-200">
+      <div class="bg-white p-3.5 rounded border border-gray-200">
         <div class="text-xs text-gray-500 font-medium">本日新着</div>
         <div class="text-2xl font-bold text-gray-900 mt-1" id="stat-today-new">--</div>
       </div>
     </section>
 
     <!-- ASP Links -->
-    <div class="flex flex-wrap items-center gap-2 pb-6 text-xs text-gray-600 border-b border-gray-100 mb-6">
+    <div class="flex flex-wrap items-center gap-2 pb-5 text-xs text-gray-600 border-b border-gray-100 mb-6">
       <span class="font-medium text-gray-700">管理画面リンク:</span>
       <a href="https://affiliate.duga.jp/" target="_blank" rel="noopener noreferrer" class="px-2.5 py-1 bg-white border border-gray-200 rounded hover:border-gray-400 transition">DUGA</a>
       <a href="https://affiliate.dmm.com/" target="_blank" rel="noopener noreferrer" class="px-2.5 py-1 bg-white border border-gray-200 rounded hover:border-gray-400 transition">FANZA/DMM</a>
@@ -65,11 +65,11 @@
 
     <!-- Search & Title Bar -->
     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
-      <h2 class="text-sm font-bold text-gray-900">登録サイト一覧</h2>
-      <input type="text" id="search-input" placeholder="サイト名やASPで絞り込み..." class="text-xs border border-gray-300 rounded px-3 py-1.5 w-full sm:w-72 bg-white focus:outline-none focus:border-gray-500">
+      <h2 class="text-sm font-bold text-gray-900">登録サイト一覧 <span class="text-xs font-normal text-gray-500 ml-1">（カードクリックで新着記事を展開）</span></h2>
+      <input type="text" id="search-input" placeholder="サイト名やASPで絞り込み..." class="text-xs border border-gray-300 rounded px-3 py-1.5 w-full sm:w-64 bg-white focus:outline-none focus:border-gray-500">
     </div>
 
-    <!-- Vertical Stacked Cards Container (Full Width) -->
+    <!-- Vertical Stacked Cards Container -->
     <div id="sites-card-container" class="space-y-3 mb-8">
       <!-- Rendered by JS -->
     </div>
