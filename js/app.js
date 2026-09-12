@@ -1,5 +1,5 @@
 /**
- * Affiliate Portal Hub - Clean 2-Row Card Layout (Articles & New above Action Buttons)
+ * Affiliate Portal Hub - Grid Aligned & Centered Arrow Column Layout
  */
 
 let sites = [];
@@ -153,13 +153,14 @@ function renderCards() {
     return `
       <div class="bg-white border ${isExpanded ? 'border-gray-400 shadow-sm' : 'border-gray-200'} rounded overflow-hidden transition">
         
-        <!-- Header / Card Area (Clickable) -->
-        <div onclick="toggleExpand('${site.id}')" class="p-4 cursor-pointer hover:bg-gray-50/70 transition space-y-2.5 select-none">
+        <!-- Header / Card Row -->
+        <div onclick="toggleExpand('${site.id}')" class="cursor-pointer hover:bg-gray-50/70 transition flex items-stretch justify-between select-none">
           
-          <!-- Row 1: Left (Badge + Title) | Right (Total Articles + New Count + Arrow) -->
-          <div class="flex items-center justify-between gap-4">
+          <!-- Main Content 2x2 Grid (Left aligns title/meta, Right aligns numbers/buttons) -->
+          <div class="flex-1 p-4 grid grid-cols-1 sm:grid-cols-[1fr_auto] gap-x-6 gap-y-2.5 items-center">
             
-            <div class="flex items-center gap-2.5 min-w-0 flex-1">
+            <!-- Top-Left: Status Badge & Full Title -->
+            <div class="flex items-center gap-2.5 min-w-0">
               <span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-medium whitespace-nowrap ${isOk ? 'bg-green-50 text-green-700 border border-green-200' : 'bg-red-50 text-red-700 border border-red-200'}">
                 ${isOk ? '稼働中' : 'エラー'}
               </span>
@@ -168,7 +169,7 @@ function renderCards() {
               </h3>
             </div>
 
-            <!-- Right Top: Total Articles & New Count (Positioned above Action buttons) -->
+            <!-- Top-Right: Total Articles & New Count (Left aligned with action buttons below) -->
             <div class="flex items-center gap-4 text-xs whitespace-nowrap">
               <div class="flex items-center gap-1.5">
                 <span class="text-gray-400 text-[11px]">記事数:</span>
@@ -180,19 +181,10 @@ function renderCards() {
                 <span class="text-gray-400 text-[11px]">新着:</span>
                 <span class="font-bold text-sm ${recentNew > 0 ? 'text-amber-600' : 'text-gray-400'}">${recentNew > 0 ? `+${recentNew}件` : '0件'}</span>
               </div>
-
-              <div class="text-gray-400 text-xs pl-1">
-                ${isExpanded ? '▲' : '▼'}
-              </div>
             </div>
 
-          </div>
-
-          <!-- Row 2: Left (ASP/ID + Last Updated) | Right (Action Buttons: Open / Log / Setting) -->
-          <div class="flex flex-wrap items-center justify-between gap-x-4 gap-y-2 text-xs text-gray-500 pt-0.5 border-t border-gray-100 sm:border-0 sm:pt-0">
-            
-            <!-- Left Sub: ASP/ID & Last Updated -->
-            <div class="flex flex-wrap items-center gap-x-5 gap-y-1">
+            <!-- Bottom-Left: ASP/ID & Last Updated -->
+            <div class="flex flex-wrap items-center gap-x-5 gap-y-1 text-xs text-gray-500">
               <div class="flex items-center gap-1.5">
                 <span class="text-gray-400 text-[11px]">ASP / ID:</span>
                 <span class="px-2 py-0.5 bg-gray-100 text-gray-700 rounded font-medium text-[11px]">
@@ -206,8 +198,8 @@ function renderCards() {
               </div>
             </div>
 
-            <!-- Right Sub: Action Buttons (Placed directly below Articles & New) -->
-            <div class="flex items-center gap-1.5 whitespace-nowrap ml-auto" onclick="event.stopPropagation()">
+            <!-- Bottom-Right: Action Buttons (Left edge exactly matches Articles above) -->
+            <div class="flex items-center gap-1.5 whitespace-nowrap" onclick="event.stopPropagation()">
               <a href="${site.siteUrl}" target="_blank" rel="noopener noreferrer" class="px-2.5 py-1 text-gray-700 bg-white border border-gray-300 rounded hover:bg-gray-50 text-xs font-medium">
                 サイトを開く
               </a>
@@ -221,6 +213,11 @@ function renderCards() {
               </button>
             </div>
 
+          </div>
+
+          <!-- Rightmost Column: Expand Arrow Column (Vertically Centered) -->
+          <div class="flex items-center justify-center px-4 sm:px-5 border-l border-gray-100 text-gray-400 hover:text-gray-700 transition bg-gray-50/40">
+            <span class="text-xs font-bold">${isExpanded ? '▲' : '▼'}</span>
           </div>
 
         </div>
