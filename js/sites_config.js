@@ -11,6 +11,8 @@ const DEFAULT_SITES = [
     statusUrl: "https://duga-scat-portal.pages.dev/status.json",
     repoUrl: "https://github.com/anothersky2534/duga-scat-portal",
     actionsUrl: "https://github.com/anothersky2534/duga-scat-portal/actions",
+    xUrl: "",
+    blueskyUrl: "",
     schedule: "毎日 午前4:00 (JST)",
     tags: ["DUGA", "スカトロ", "自動更新", "Cloudflare Pages"]
   },
@@ -23,6 +25,8 @@ const DEFAULT_SITES = [
     statusUrl: "https://fc2-ranking-and-review.anothersky2534.workers.dev/status.json",
     repoUrl: "",
     actionsUrl: "",
+    xUrl: "",
+    blueskyUrl: "",
     schedule: "定期更新",
     tags: ["FC2", "ランキング", "Cloudflare Workers"]
   }

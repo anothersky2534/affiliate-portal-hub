@@ -36,6 +36,8 @@ const siteNameInput = document.getElementById('site-name');
 const siteUrlInput = document.getElementById('site-url');
 const statusUrlInput = document.getElementById('status-url');
 const actionsUrlInput = document.getElementById('actions-url');
+const siteXUrlInput = document.getElementById('site-x-url');
+const siteBskyUrlInput = document.getElementById('site-bsky-url');
 const categoryInput = document.getElementById('site-category');
 const aspInput = document.getElementById('site-asp');
 const deleteSiteBtn = document.getElementById('btn-delete-site');
@@ -219,7 +221,7 @@ function renderCards() {
           <!-- Main Content 2x2 Grid (Left aligns title/meta, Right aligns numbers/buttons) -->
           <div class="flex-1 p-4 grid grid-cols-1 sm:grid-cols-[1fr_auto] gap-x-6 gap-y-2.5 items-center">
             
-            <!-- Top-Left: Status Badge & Full Title -->
+            <!-- Top-Left: Status Badge & Full Title & SNS Icons -->
             <div class="flex items-center gap-2.5 min-w-0">
               <span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-medium whitespace-nowrap ${isOk ? 'bg-green-50 text-green-700 border border-green-200' : 'bg-red-50 text-red-700 border border-red-200'}">
                 ${isOk ? '稼働中' : 'エラー'}
@@ -227,6 +229,24 @@ function renderCards() {
               <h3 class="text-sm sm:text-base font-bold text-gray-900 leading-snug truncate">
                 ${site.name}
               </h3>
+              ${(site.xUrl || site.blueskyUrl) ? `
+                <div class="flex items-center gap-1 flex-shrink-0" onclick="event.stopPropagation()">
+                  ${site.xUrl ? `
+                    <a href="${site.xUrl}" target="_blank" rel="noopener noreferrer" class="p-1 text-gray-500 hover:text-black hover:bg-gray-100 rounded transition flex items-center justify-center" title="X (Twitter) を開く">
+                      <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24">
+                        <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+                      </svg>
+                    </a>
+                  ` : ''}
+                  ${site.blueskyUrl ? `
+                    <a href="${site.blueskyUrl}" target="_blank" rel="noopener noreferrer" class="p-1 text-[#1185fe] hover:text-[#006ee6] hover:bg-blue-50 rounded transition flex items-center justify-center" title="Bluesky を開く">
+                      <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24">
+                        <path d="M12 10.8c-1.087-2.114-4.046-6.053-6.798-7.995C2.566 0.944 1.561 1.266 0.902 1.565 0.139 1.908 0 3.08 0 3.768c0 .69.378 5.65.624 6.479.815 2.736 3.713 3.66 6.383 3.364.136-.02.275-.039.415-.056-.138.022-.276.04-.415.056-3.912.58-7.387 2.005-2.83 7.078 5.013 5.19 6.87-1.113 7.823-4.308.953 3.195 2.05 9.271 7.733 4.308 4.267-4.814.982-6.498-2.931-7.078-.139-.016-.277-.034-.415-.056.14.017.279.036.415.056 2.67.297 5.568-.628 6.383-3.364.246-.828.624-5.79.624-6.478 0-.69-.139-1.861-.902-2.204-.659-.298-1.664-.62-4.3 1.24C16.046 4.748 13.087 8.687 12 10.8z"/>
+                      </svg>
+                    </a>
+                  ` : ''}
+                </div>
+              ` : ''}
             </div>
 
             <!-- Top-Right: Total Articles & New Count (Left aligned with action buttons below) -->
@@ -369,7 +389,9 @@ function setupEventListeners() {
       asp: aspInput.value.trim(),
       siteUrl: siteUrlInput.value.trim(),
       statusUrl: statusUrlInput.value.trim(),
-      actionsUrl: actionsUrlInput.value.trim()
+      actionsUrl: actionsUrlInput.value.trim(),
+      xUrl: siteXUrlInput.value.trim(),
+      blueskyUrl: siteBskyUrlInput.value.trim()
     };
 
     const idx = sites.findIndex(s => s.id === id);
@@ -433,6 +455,8 @@ function openAddModal() {
   siteForm.reset();
   siteIdInput.value = '';
   statusUrlInput.dataset.autoFilled = 'true';
+  siteXUrlInput.value = '';
+  siteBskyUrlInput.value = '';
   deleteSiteBtn.classList.add('hidden');
   siteModal.classList.remove('hidden');
   siteModal.classList.add('flex');
@@ -449,6 +473,8 @@ function openEditModal(siteId) {
   statusUrlInput.value = site.statusUrl;
   statusUrlInput.dataset.autoFilled = 'false';
   actionsUrlInput.value = site.actionsUrl || '';
+  siteXUrlInput.value = site.xUrl || '';
+  siteBskyUrlInput.value = site.blueskyUrl || '';
   categoryInput.value = site.category || '';
   aspInput.value = site.asp || '';
 
