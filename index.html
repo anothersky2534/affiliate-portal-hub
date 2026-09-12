@@ -54,13 +54,15 @@
       </div>
     </section>
 
-    <!-- ASP Links -->
+    <!-- ASP Links (Dynamic with + add button) -->
     <div class="flex flex-wrap items-center gap-2 pb-5 text-xs text-gray-600 border-b border-gray-100 mb-6">
       <span class="font-medium text-gray-700">管理画面リンク:</span>
-      <a href="https://affiliate.duga.jp/" target="_blank" rel="noopener noreferrer" class="px-2.5 py-1 bg-white border border-gray-200 rounded hover:border-gray-400 transition">DUGA</a>
-      <a href="https://affiliate.dmm.com/" target="_blank" rel="noopener noreferrer" class="px-2.5 py-1 bg-white border border-gray-200 rounded hover:border-gray-400 transition">FANZA/DMM</a>
-      <a href="https://search.google.com/search-console" target="_blank" rel="noopener noreferrer" class="px-2.5 py-1 bg-white border border-gray-200 rounded hover:border-gray-400 transition">Search Console</a>
-      <a href="https://analytics.google.com/" target="_blank" rel="noopener noreferrer" class="px-2.5 py-1 bg-white border border-gray-200 rounded hover:border-gray-400 transition">Analytics</a>
+      <div id="asp-links-container" class="flex flex-wrap items-center gap-2">
+        <!-- Rendered by JS -->
+      </div>
+      <button onclick="openAddLinkModal()" class="px-2 py-0.5 text-xs text-gray-500 hover:text-gray-900 bg-gray-100 hover:bg-gray-200 border border-gray-300 rounded font-bold transition flex items-center gap-1" title="管理画面リンクを追加">
+        <span>＋</span>
+      </button>
     </div>
 
     <!-- Search & Title Bar -->
@@ -203,8 +205,40 @@
     </div>
   </div>
 
-  <script src="js/sites_config.js?v=8"></script>
-  <script src="js/app.js?v=8"></script>
+  <!-- Link Modal -->
+  <div id="link-modal" class="fixed inset-0 bg-black/30 hidden items-center justify-center p-4 z-50">
+    <div class="bg-white rounded-lg border border-gray-300 shadow-lg max-w-sm w-full p-6 space-y-4">
+      <div class="flex items-center justify-between pb-3 border-b border-gray-200">
+        <h3 id="link-modal-title" class="text-sm font-bold text-gray-900">管理画面リンク追加</h3>
+        <button onclick="closeLinkModal()" class="text-gray-400 hover:text-gray-600 text-lg leading-none">&times;</button>
+      </div>
+
+      <form id="link-form" class="space-y-3 text-xs">
+        <input type="hidden" id="link-id">
+
+        <div>
+          <label class="block font-medium text-gray-700 mb-1">表示名（例: DUGA, FC2, A8等）</label>
+          <input type="text" id="link-name" required placeholder="例: FC2アフィリエイト" class="w-full border border-gray-300 rounded px-3 py-1.5 focus:outline-none focus:border-gray-500">
+        </div>
+
+        <div>
+          <label class="block font-medium text-gray-700 mb-1">URL</label>
+          <input type="url" id="link-url" required placeholder="https://affiliate.fc2.com/" class="w-full border border-gray-300 rounded px-3 py-1.5 focus:outline-none focus:border-gray-500">
+        </div>
+
+        <div class="pt-3 border-t border-gray-200 flex items-center justify-between">
+          <button type="button" id="btn-delete-link" class="text-red-600 hover:underline hidden">削除</button>
+          <div class="flex items-center gap-2 ml-auto">
+            <button type="button" onclick="closeLinkModal()" class="px-3 py-1.5 border border-gray-300 rounded text-gray-700 hover:bg-gray-50">キャンセル</button>
+            <button type="submit" class="px-3 py-1.5 bg-gray-900 text-white rounded hover:bg-gray-800">保存</button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="js/sites_config.js?v=10"></script>
+  <script src="js/app.js?v=10"></script>
   <script>
     function toggleGuide() {
       const content = document.getElementById('guide-content');

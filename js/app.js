@@ -1,13 +1,24 @@
 /**
- * Affiliate Portal Hub - Grid Aligned & Centered Arrow Column Layout
+ * Affiliate Portal Hub - Main Logic with Dynamic Links Management
  */
 
+const DEFAULT_LINKS = [
+  { id: 'duga', name: 'DUGA', url: 'https://affiliate.duga.jp/' },
+  { id: 'fanza', name: 'FANZA/DMM', url: 'https://affiliate.dmm.com/' },
+  { id: 'fc2', name: 'FC2', url: 'https://affiliate.fc2.com/' },
+  { id: 'gsc', name: 'Search Console', url: 'https://search.google.com/search-console' },
+  { id: 'ga', name: 'Analytics', url: 'https://analytics.google.com/' }
+];
+
 let sites = [];
+let links = [];
 let siteStatuses = {};
 let searchQuery = '';
 let expandedSites = new Set();
 
+// Elements
 const cardContainer = document.getElementById('sites-card-container');
+const aspLinksContainer = document.getElementById('asp-links-container');
 const totalSitesEl = document.getElementById('stat-total-sites');
 const activeSitesEl = document.getElementById('stat-active-sites');
 const errorSitesEl = document.getElementById('stat-error-sites');
@@ -16,7 +27,7 @@ const lastSyncTimeEl = document.getElementById('last-sync-time');
 const refreshBtn = document.getElementById('btn-refresh');
 const searchInput = document.getElementById('search-input');
 
-// Modal Elements
+// Site Modal Elements
 const siteModal = document.getElementById('site-modal');
 const siteForm = document.getElementById('site-form');
 const modalTitle = document.getElementById('modal-title');
@@ -29,15 +40,27 @@ const categoryInput = document.getElementById('site-category');
 const aspInput = document.getElementById('site-asp');
 const deleteSiteBtn = document.getElementById('btn-delete-site');
 
+// Link Modal Elements
+const linkModal = document.getElementById('link-modal');
+const linkForm = document.getElementById('link-form');
+const linkModalTitle = document.getElementById('link-modal-title');
+const linkIdInput = document.getElementById('link-id');
+const linkNameInput = document.getElementById('link-name');
+const linkUrlInput = document.getElementById('link-url');
+const deleteLinkBtn = document.getElementById('btn-delete-link');
+
 document.addEventListener('DOMContentLoaded', () => {
   loadSites();
+  loadLinks();
   setupEventListeners();
+  renderLinks();
   refreshAllSites();
 
   // Auto refresh every 5 mins
   setInterval(() => refreshAllSites(false), 5 * 60 * 1000);
 });
 
+// Load Sites
 function loadSites() {
   const saved = localStorage.getItem('affiliate_hub_sites');
   if (saved) {
@@ -54,6 +77,40 @@ function loadSites() {
 
 function saveSites() {
   localStorage.setItem('affiliate_hub_sites', JSON.stringify(sites));
+}
+
+// Load Links
+function loadLinks() {
+  const saved = localStorage.getItem('affiliate_hub_links');
+  if (saved) {
+    try {
+      links = JSON.parse(saved);
+    } catch (e) {
+      links = [...DEFAULT_LINKS];
+    }
+  } else {
+    links = [...DEFAULT_LINKS];
+    saveLinks();
+  }
+}
+
+function saveLinks() {
+  localStorage.setItem('affiliate_hub_links', JSON.stringify(links));
+}
+
+// Render Links
+function renderLinks() {
+  if (!aspLinksContainer) return;
+  aspLinksContainer.innerHTML = links.map(link => `
+    <div class="inline-flex items-center bg-white border border-gray-200 rounded hover:border-gray-400 transition group shadow-sm">
+      <a href="${link.url}" target="_blank" rel="noopener noreferrer" class="px-2.5 py-1 text-gray-700 hover:text-blue-600 transition">
+        ${link.name}
+      </a>
+      <button onclick="openEditLinkModal('${link.id}')" class="px-1 text-gray-300 hover:text-gray-600 border-l border-gray-100 hover:bg-gray-50 rounded-r py-1 text-[10px]" title="リンク設定・編集">
+        ⚙
+      </button>
+    </div>
+  `).join('');
 }
 
 async function fetchSiteStatus(site) {
@@ -289,6 +346,7 @@ function setupEventListeners() {
     statusUrlInput.dataset.autoFilled = 'false';
   });
 
+  // Site Form Submit
   siteForm.addEventListener('submit', (e) => {
     e.preventDefault();
     const id = siteIdInput.value.trim() || 'site-' + Date.now();
@@ -323,8 +381,41 @@ function setupEventListeners() {
       refreshAllSites(true);
     }
   });
+
+  // Link Form Submit
+  linkForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const id = linkIdInput.value.trim() || 'link-' + Date.now();
+    const newLink = {
+      id: id,
+      name: linkNameInput.value.trim(),
+      url: linkUrlInput.value.trim()
+    };
+
+    const idx = links.findIndex(l => l.id === id);
+    if (idx >= 0) {
+      links[idx] = newLink;
+    } else {
+      links.push(newLink);
+    }
+
+    saveLinks();
+    closeLinkModal();
+    renderLinks();
+  });
+
+  deleteLinkBtn.addEventListener('click', () => {
+    const id = linkIdInput.value.trim();
+    if (confirm('この管理リンクを削除しますか？')) {
+      links = links.filter(l => l.id !== id);
+      saveLinks();
+      closeLinkModal();
+      renderLinks();
+    }
+  });
 }
 
+// Site Modal Handlers
 function openAddModal() {
   modalTitle.textContent = 'サイト追加';
   siteForm.reset();
@@ -359,11 +450,45 @@ function closeModal() {
   siteModal.classList.remove('flex');
 }
 
+// Link Modal Handlers
+function openAddLinkModal() {
+  linkModalTitle.textContent = '管理画面リンク追加';
+  linkForm.reset();
+  linkIdInput.value = '';
+  deleteLinkBtn.classList.add('hidden');
+  linkModal.classList.remove('hidden');
+  linkModal.classList.add('flex');
+}
+
+function openEditLinkModal(linkId) {
+  const link = links.find(l => l.id === linkId);
+  if (!link) return;
+
+  linkModalTitle.textContent = '管理画面リンク編集';
+  linkIdInput.value = link.id;
+  linkNameInput.value = link.name;
+  linkUrlInput.value = link.url;
+
+  deleteLinkBtn.classList.remove('hidden');
+  linkModal.classList.remove('hidden');
+  linkModal.classList.add('flex');
+}
+
+function closeLinkModal() {
+  linkModal.classList.add('hidden');
+  linkModal.classList.remove('flex');
+}
+
+// Export / Import
 function exportConfig() {
-  const blob = new Blob([JSON.stringify(sites, null, 2)], { type: 'application/json' });
+  const exportData = {
+    sites: sites,
+    links: links
+  };
+  const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
   const a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
-  a.download = `affiliate_hub_sites.json`;
+  a.download = `affiliate_hub_config.json`;
   a.click();
 }
 
@@ -378,8 +503,19 @@ function importConfig(event) {
       if (Array.isArray(imported)) {
         sites = imported;
         saveSites();
-        refreshAllSites(true);
+      } else if (imported && typeof imported === 'object') {
+        if (Array.isArray(imported.sites)) {
+          sites = imported.sites;
+          saveSites();
+        }
+        if (Array.isArray(imported.links)) {
+          links = imported.links;
+          saveLinks();
+        }
       }
+      renderLinks();
+      refreshAllSites(true);
+      alert('設定を正常にインポートしました！');
     } catch (err) {
       alert('無効なJSONです');
     }
