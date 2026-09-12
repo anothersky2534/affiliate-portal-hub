@@ -279,11 +279,19 @@ function renderCards() {
 
         </div>
 
-        <!-- Expanded Accordion: Recent Added Pages List -->
+        <!-- Expanded Accordion: Recent Added Pages List (Strict New Addition Order) -->
         ${isExpanded ? `
           <div class="border-t border-gray-200 bg-gray-50/50 p-4 space-y-2">
+            <div class="flex items-center justify-between text-xs text-gray-700 pb-1.5 border-b border-gray-200/80">
+              <span class="font-bold flex items-center gap-1.5">
+                <span>🔥 直近の自動追加・生成記事一覧</span>
+                <span class="text-[11px] font-normal text-gray-500 font-mono">(${recentItems.length}件 / 最新追加順)</span>
+              </span>
+              <span class="text-[11px] text-gray-400">クリックで個別レビューページを直接確認</span>
+            </div>
+
             ${recentItems.length === 0 ? `
-              <div class="text-xs text-gray-400 py-2 text-center">新着記事データはありません</div>
+              <div class="text-xs text-gray-400 py-3 text-center">新着記事データはありません</div>
             ` : `
               <div class="divide-y divide-gray-100 bg-white rounded border border-gray-200 overflow-hidden">
                 ${recentItems.map((item, idx) => {
@@ -291,16 +299,18 @@ function renderCards() {
                   return `
                     <div class="p-2.5 hover:bg-blue-50/40 transition flex items-center justify-between gap-3 text-xs">
                       <div class="flex items-center gap-2 min-w-0 flex-1">
-                        <span class="text-gray-400 font-mono text-[11px] w-5 text-right">${idx + 1}.</span>
+                        <span class="text-gray-400 font-mono text-[11px] w-5 text-right font-medium">${idx + 1}.</span>
                         <span class="text-[10px] px-1.5 py-0.5 bg-gray-100 text-gray-600 rounded whitespace-nowrap font-medium">
                           ${item.category || '一般'}
                         </span>
-                        <a href="${itemUrl}" target="_blank" rel="noopener noreferrer" class="font-medium text-gray-900 hover:text-blue-600 truncate">
+                        ${item.item_id ? `<span class="text-[10px] text-gray-400 font-mono whitespace-nowrap">[${item.item_id}]</span>` : ''}
+                        <a href="${itemUrl}" target="_blank" rel="noopener noreferrer" class="font-medium text-gray-900 hover:text-blue-600 truncate" title="${item.title}">
                           ${item.title}
                         </a>
                       </div>
 
                       <div class="flex items-center gap-3 whitespace-nowrap text-gray-500 text-[11px]">
+                        ${item.date ? `<span class="text-gray-400 font-mono text-[10px]">${item.date}</span>` : ''}
                         ${item.price ? `<span>${item.price}</span>` : ''}
                         ${item.rating ? `<span class="text-amber-600 font-medium">★${item.rating}</span>` : ''}
                         <a href="${itemUrl}" target="_blank" rel="noopener noreferrer" class="text-blue-600 hover:underline font-medium">
