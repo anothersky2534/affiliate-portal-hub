@@ -287,7 +287,7 @@ function renderCards() {
           <div class="border-t border-gray-200 bg-gray-50/50 p-4 space-y-2">
             <div class="flex items-center justify-between text-xs text-gray-700 pb-1.5 border-b border-gray-200/80">
               <span class="font-bold flex items-center gap-1.5">
-                <span>🔥 今回新しく自動追加・生成された記事</span>
+                <span>本日自動追加された新着記事</span>
                 <span class="text-[11px] font-bold ${recentNew > 0 ? 'text-amber-600' : 'text-gray-500'} font-mono">(${recentNew}件)</span>
               </span>
               <span class="text-[11px] text-gray-400">クリックで生成された記事ページを開く</span>
@@ -302,16 +302,10 @@ function renderCards() {
                 ${newItemsOnly.map((item, idx) => {
                   const itemUrl = `${site.siteUrl.replace(/\/+$/, '')}/reviews/${item.item_id}.html`;
                   return `
-                    <div class="p-2.5 hover:bg-amber-50/40 transition flex items-center justify-between gap-3 text-xs">
+                    <div class="p-2.5 hover:bg-gray-50 transition flex items-center justify-between gap-3 text-xs">
                       <div class="flex items-center gap-2 min-w-0 flex-1">
-                        <span class="text-amber-600 font-mono text-[11px] w-5 text-right font-bold">${idx + 1}.</span>
-                        <span class="text-[10px] px-1.5 py-0.5 bg-amber-100 text-amber-800 rounded whitespace-nowrap font-bold">
-                          NEW
-                        </span>
-                        <span class="text-[10px] px-1.5 py-0.5 bg-gray-100 text-gray-600 rounded whitespace-nowrap font-medium">
-                          ${item.category || '一般'}
-                        </span>
-                        ${item.item_id ? `<span class="text-[10px] text-gray-400 font-mono whitespace-nowrap">[${item.item_id}]</span>` : ''}
+                        <span class="text-gray-400 font-mono text-[11px] w-5 text-right">${idx + 1}.</span>
+                        ${item.item_id ? `<span class="text-[11px] text-gray-400 font-mono whitespace-nowrap">[${item.item_id}]</span>` : ''}
                         <a href="${itemUrl}" target="_blank" rel="noopener noreferrer" class="font-medium text-gray-900 hover:text-blue-600 truncate" title="${item.title}">
                           ${item.title}
                         </a>
@@ -321,7 +315,7 @@ function renderCards() {
                         ${item.date ? `<span class="text-gray-400 font-mono text-[10px]">${item.date}</span>` : ''}
                         ${item.price ? `<span>${item.price}</span>` : ''}
                         ${item.rating ? `<span class="text-amber-600 font-medium">★${item.rating}</span>` : ''}
-                        <a href="${itemUrl}" target="_blank" rel="noopener noreferrer" class="text-blue-600 hover:underline font-bold">
+                        <a href="${itemUrl}" target="_blank" rel="noopener noreferrer" class="text-blue-600 hover:underline font-medium">
                           記事を開く ↗
                         </a>
                       </div>
