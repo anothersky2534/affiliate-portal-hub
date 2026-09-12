@@ -1,5 +1,5 @@
 /**
- * Affiliate Portal Hub - Inline Header Accordion Logic
+ * Affiliate Portal Hub - Clean 2-Row Card Layout
  */
 
 let sites = [];
@@ -153,64 +153,78 @@ function renderCards() {
     return `
       <div class="bg-white border ${isExpanded ? 'border-gray-400 shadow-sm' : 'border-gray-200'} rounded overflow-hidden transition">
         
-        <!-- Header / Card Row: All elements aligned horizontally side-by-side -->
-        <div onclick="toggleExpand('${site.id}')" class="p-3.5 cursor-pointer hover:bg-gray-50/70 transition flex flex-wrap items-center justify-between gap-3 select-none">
+        <!-- Header / Card Area (Clickable) -->
+        <div onclick="toggleExpand('${site.id}')" class="p-4 cursor-pointer hover:bg-gray-50/70 transition space-y-2.5 select-none">
           
-          <!-- Left: Status Badge, Title, Category -->
-          <div class="flex items-center gap-2 min-w-0 flex-1">
-            <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[11px] font-medium whitespace-nowrap ${isOk ? 'bg-green-50 text-green-700 border border-green-200' : 'bg-red-50 text-red-700 border border-red-200'}">
-              ${isOk ? '稼働中' : 'エラー'}
-            </span>
-            <span class="text-xs sm:text-sm font-bold text-gray-900 truncate">
-              ${site.name}
-            </span>
-            <span class="text-[10px] sm:text-[11px] px-1.5 py-0.5 bg-gray-100 text-gray-600 rounded whitespace-nowrap hidden sm:inline-block">
-              ${site.asp || 'DUGA'}
-            </span>
-          </div>
-
-          <!-- Right: Updated Time, Article Count, New Count, Action Buttons (All Inline next to title) -->
-          <div class="flex items-center gap-3 sm:gap-4 text-xs text-gray-600 whitespace-nowrap">
+          <!-- Row 1: Status Badge, Full Title, and Action Buttons on the right -->
+          <div class="flex items-center justify-between gap-4">
             
-            <div class="text-gray-500 text-[11px]">
-              更新: <span class="font-mono text-gray-800">${lastUpdated ? lastUpdated.split(' ')[1] || lastUpdated : '--'}</span>
+            <div class="flex items-center gap-2.5 min-w-0 flex-1">
+              <span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-medium whitespace-nowrap ${isOk ? 'bg-green-50 text-green-700 border border-green-200' : 'bg-red-50 text-red-700 border border-red-200'}">
+                ${isOk ? '稼働中' : 'エラー'}
+              </span>
+              <h3 class="text-sm sm:text-base font-bold text-gray-900 leading-snug">
+                ${site.name}
+              </h3>
             </div>
 
-            <div class="text-[11px]">
-              記事数: <span class="font-bold text-gray-900">${totalItems}</span>
-            </div>
-
-            <div class="text-[11px]">
-              新着: <span class="font-bold ${recentNew > 0 ? 'text-amber-600' : 'text-gray-400'}">${recentNew > 0 ? `+${recentNew}` : '0'}</span>
-            </div>
-
-            <!-- Action Buttons -->
-            <div class="flex items-center gap-1 pl-1 border-l border-gray-200" onclick="event.stopPropagation()">
-              <a href="${site.siteUrl}" target="_blank" rel="noopener noreferrer" class="px-2 py-0.5 text-gray-700 bg-white border border-gray-300 rounded hover:bg-gray-50 text-xs font-medium">
+            <!-- Right: Action Buttons & Expand Icon -->
+            <div class="flex items-center gap-1.5 whitespace-nowrap" onclick="event.stopPropagation()">
+              <a href="${site.siteUrl}" target="_blank" rel="noopener noreferrer" class="px-2.5 py-1 text-gray-700 bg-white border border-gray-300 rounded hover:bg-gray-50 text-xs font-medium">
                 サイトを開く
               </a>
               ${site.actionsUrl ? `
-                <a href="${site.actionsUrl}" target="_blank" rel="noopener noreferrer" class="px-2 py-0.5 text-gray-700 bg-white border border-gray-300 rounded hover:bg-gray-50 text-xs">
+                <a href="${site.actionsUrl}" target="_blank" rel="noopener noreferrer" class="px-2.5 py-1 text-gray-700 bg-white border border-gray-300 rounded hover:bg-gray-50 text-xs font-medium">
                   ログ
                 </a>
               ` : ''}
-              <button onclick="openEditModal('${site.id}')" class="px-1.5 py-0.5 text-gray-400 hover:text-gray-700 text-xs rounded hover:bg-gray-100" title="設定">
+              <button onclick="openEditModal('${site.id}')" class="px-2 py-1 text-gray-400 hover:text-gray-700 text-xs rounded hover:bg-gray-100" title="設定">
                 設定
               </button>
+              <div class="text-gray-400 text-xs pl-1">
+                ${isExpanded ? '▲' : '▼'}
+              </div>
             </div>
 
-            <!-- Expand Arrow -->
-            <div class="text-gray-400 text-xs">
-              ${isExpanded ? '▲' : '▼'}
+          </div>
+
+          <!-- Row 2: Agent ID / ASP, Last Updated, Article Count, New Count -->
+          <div class="flex flex-wrap items-center gap-x-6 gap-y-1 text-xs text-gray-500 pt-0.5">
+            
+            <!-- ASP / Agent ID -->
+            <div class="flex items-center gap-1.5">
+              <span class="text-gray-400 text-[11px]">ASP / ID:</span>
+              <span class="px-2 py-0.5 bg-gray-100 text-gray-700 rounded font-medium text-[11px]">
+                ${site.asp || 'DUGA'}
+              </span>
+            </div>
+
+            <!-- Last Updated -->
+            <div class="flex items-center gap-1.5">
+              <span class="text-gray-400 text-[11px]">最終更新:</span>
+              <span class="font-mono text-gray-800 font-medium">${lastUpdated}</span>
+            </div>
+
+            <!-- Total Articles -->
+            <div class="flex items-center gap-1.5">
+              <span class="text-gray-400 text-[11px]">記事数:</span>
+              <span class="font-bold text-gray-900">${totalItems}</span>
+              <span class="text-gray-400 text-[11px]">件</span>
+            </div>
+
+            <!-- New Articles -->
+            <div class="flex items-center gap-1.5">
+              <span class="text-gray-400 text-[11px]">新着:</span>
+              <span class="font-bold ${recentNew > 0 ? 'text-amber-600' : 'text-gray-400'}">${recentNew > 0 ? `+${recentNew}件` : '0件'}</span>
             </div>
 
           </div>
 
         </div>
 
-        <!-- Expanded Accordion: Recent Added Pages List (No '直近追加' text) -->
+        <!-- Expanded Accordion: Recent Added Pages List -->
         ${isExpanded ? `
-          <div class="border-t border-gray-200 bg-gray-50/50 p-3 space-y-2">
+          <div class="border-t border-gray-200 bg-gray-50/50 p-4 space-y-2">
             ${recentItems.length === 0 ? `
               <div class="text-xs text-gray-400 py-2 text-center">新着記事データはありません</div>
             ` : `
@@ -218,10 +232,10 @@ function renderCards() {
                 ${recentItems.map((item, idx) => {
                   const itemUrl = `${site.siteUrl.replace(/\/+$/, '')}/reviews/${item.item_id}.html`;
                   return `
-                    <div class="p-2 hover:bg-blue-50/40 transition flex items-center justify-between gap-3 text-xs">
+                    <div class="p-2.5 hover:bg-blue-50/40 transition flex items-center justify-between gap-3 text-xs">
                       <div class="flex items-center gap-2 min-w-0 flex-1">
-                        <span class="text-gray-400 font-mono text-[10px] w-4 text-right">${idx + 1}.</span>
-                        <span class="text-[10px] px-1 py-0.5 bg-gray-100 text-gray-600 rounded whitespace-nowrap">
+                        <span class="text-gray-400 font-mono text-[11px] w-5 text-right">${idx + 1}.</span>
+                        <span class="text-[10px] px-1.5 py-0.5 bg-gray-100 text-gray-600 rounded whitespace-nowrap font-medium">
                           ${item.category || '一般'}
                         </span>
                         <a href="${itemUrl}" target="_blank" rel="noopener noreferrer" class="font-medium text-gray-900 hover:text-blue-600 truncate">
@@ -229,10 +243,10 @@ function renderCards() {
                         </a>
                       </div>
 
-                      <div class="flex items-center gap-2 whitespace-nowrap text-gray-500 text-[11px]">
+                      <div class="flex items-center gap-3 whitespace-nowrap text-gray-500 text-[11px]">
                         ${item.price ? `<span>${item.price}</span>` : ''}
                         ${item.rating ? `<span class="text-amber-600 font-medium">★${item.rating}</span>` : ''}
-                        <a href="${itemUrl}" target="_blank" rel="noopener noreferrer" class="text-blue-600 hover:underline font-medium ml-1">
+                        <a href="${itemUrl}" target="_blank" rel="noopener noreferrer" class="text-blue-600 hover:underline font-medium">
                           記事を開く ↗
                         </a>
                       </div>
