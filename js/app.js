@@ -287,7 +287,7 @@ function renderCards() {
                 ${recentDeleted > 0 ? `
                   <div class="flex items-center gap-1">
                     <span class="text-gray-400 text-[11px]">削除:</span>
-                    <span class="font-bold text-sm text-gray-600 font-mono">${recentDeleted}件</span>
+                    <span class="font-bold text-sm text-red-600 font-mono">${recentDeleted}件</span>
                   </div>
                 ` : ''}
               </div>
