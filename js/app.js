@@ -346,8 +346,8 @@ function renderCards() {
                     return `
                       <div class="p-2.5 hover:bg-amber-50/25 transition flex items-center justify-between gap-3 text-xs">
                         <div class="flex items-center gap-2 min-w-0 flex-1">
-                          <span class="text-amber-600 font-mono text-[11px] w-5 text-right font-bold">${idx + 1}.</span>
-                          ${item.item_id ? `<span class="text-[11px] text-gray-400 font-mono whitespace-nowrap">[${item.item_id}]</span>` : ''}
+                          <span class="text-amber-600 font-mono text-[11px] w-6 flex-shrink-0 text-right tabular-nums font-bold">${idx + 1}.</span>
+                          ${item.item_id ? `<span class="text-[11px] text-gray-400 font-mono whitespace-nowrap flex-shrink-0">[${item.item_id}]</span>` : ''}
                           <a href="${itemUrl}" target="_blank" rel="noopener noreferrer" class="font-medium text-gray-900 hover:text-blue-600 truncate" title="${item.title}">
                             ${item.title}
                           </a>
@@ -390,8 +390,8 @@ function renderCards() {
                     return `
                       <div class="p-2.5 hover:bg-blue-50/20 transition flex items-center justify-between gap-3 text-xs">
                         <div class="flex items-center gap-2 min-w-0 flex-1">
-                          <span class="text-gray-400 font-mono text-[11px] w-5 text-right">${idx + 1}.</span>
-                          ${item.item_id ? `<span class="text-[11px] text-gray-400 font-mono whitespace-nowrap">[${item.item_id}]</span>` : ''}
+                          <span class="text-gray-400 font-mono text-[11px] w-6 flex-shrink-0 text-right tabular-nums">${idx + 1}.</span>
+                          ${item.item_id ? `<span class="text-[11px] text-gray-400 font-mono whitespace-nowrap flex-shrink-0">[${item.item_id}]</span>` : ''}
                           <a href="${itemUrl}" target="_blank" rel="noopener noreferrer" class="font-medium text-gray-800 hover:text-blue-600 truncate" title="${item.title}">
                             ${item.title}
                           </a>
