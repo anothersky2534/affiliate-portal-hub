@@ -274,12 +274,10 @@ function renderCards() {
                   <span class="text-gray-400 text-[11px]">新規:</span>
                   <span class="font-bold text-sm ${recentNew > 0 ? 'text-amber-600' : 'text-gray-400'}">${recentNew > 0 ? `+${recentNew}件` : '0件'}</span>
                 </div>
-                ${(recentUpdated > 0 || updatedArticles.length > 0) ? `
-                  <div class="flex items-center gap-1">
-                    <span class="text-gray-400 text-[11px]">更新:</span>
-                    <span class="font-bold text-sm text-blue-600 font-mono">${recentUpdated || updatedArticles.length}件</span>
-                  </div>
-                ` : ''}
+                <div class="flex items-center gap-1">
+                  <span class="text-gray-400 text-[11px]">更新:</span>
+                  <span class="font-bold text-sm ${recentUpdated > 0 ? 'text-blue-600' : 'text-gray-400'} font-mono">${recentUpdated > 0 ? `${recentUpdated}件` : '0件'}</span>
+                </div>
               </div>
             </div>
 
@@ -371,17 +369,21 @@ function renderCards() {
             </div>
 
             <!-- 2. 既存で更新・再生成された記事 -->
-            ${(updatedArticles.length > 0 || recentUpdated > 0) ? `
-              <div class="space-y-2 pt-1">
-                <div class="flex items-center justify-between text-xs text-gray-700 pb-1.5 border-b border-gray-200/80">
-                  <span class="font-bold flex items-center gap-1.5">
-                    <span class="inline-block w-2 h-2 rounded-full bg-blue-500"></span>
-                    <span>既存で更新された記事</span>
-                    <span class="text-[11px] font-bold text-blue-600 font-mono">(${recentUpdated || updatedArticles.length}件)</span>
-                  </span>
-                  <span class="text-[11px] text-gray-400">価格・順位・レビュー等の最新化</span>
-                </div>
+            <div class="space-y-2 pt-1">
+              <div class="flex items-center justify-between text-xs text-gray-700 pb-1.5 border-b border-gray-200/80">
+                <span class="font-bold flex items-center gap-1.5">
+                  <span class="inline-block w-2 h-2 rounded-full ${recentUpdated > 0 ? 'bg-blue-500' : 'bg-gray-300'}"></span>
+                  <span>既存で更新された記事</span>
+                  <span class="text-[11px] font-bold ${recentUpdated > 0 ? 'text-blue-600' : 'text-gray-400'} font-mono">(${recentUpdated}件)</span>
+                </span>
+                ${updatedArticles.length > 0 ? `<span class="text-[11px] text-gray-400">価格・順位・レビュー等の最新化</span>` : ''}
+              </div>
 
+              ${updatedArticles.length === 0 ? `
+                <div class="text-xs text-gray-400 py-3 px-3.5 bg-white rounded border border-gray-200">
+                  今回の自動更新で更新された既存記事はありません（更新 0件）
+                </div>
+              ` : `
                 <div class="divide-y divide-gray-100 bg-white rounded border border-gray-200 overflow-hidden">
                   ${updatedArticles.slice(0, 20).map((item, idx) => {
                     const itemUrl = `${site.siteUrl.replace(/\/+$/, '')}/reviews/${item.item_id}.html`;
@@ -407,8 +409,8 @@ function renderCards() {
                     `;
                   }).join('')}
                 </div>
-              </div>
-            ` : ''}
+              `}
+            </div>
 
           </div>
         ` : ''}
