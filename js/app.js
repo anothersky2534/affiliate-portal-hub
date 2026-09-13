@@ -361,6 +361,7 @@ function renderCards() {
                 <div class="divide-y divide-gray-100 bg-white rounded border border-gray-200 overflow-hidden">
                   ${newArticles.map((item, idx) => {
                     const itemUrl = `${site.siteUrl.replace(/\/+$/, '')}/reviews/${item.item_id}.html`;
+                    const reasonLabel = item.reason || (item.is_new_release || (item.category && item.category.includes('新作')) ? '新作' : 'ランキング');
                     return `
                       <div class="p-2.5 hover:bg-gray-50 transition flex items-center justify-between gap-3 text-xs">
                         <div class="flex items-center gap-2 min-w-0 flex-1">
@@ -372,7 +373,7 @@ function renderCards() {
                         </div>
 
                         <div class="flex items-center gap-3 whitespace-nowrap text-gray-500 text-[11px]">
-                          ${item.reason ? `<span>${item.reason}</span>` : ''}
+                          <span>${reasonLabel}</span>
                           <a href="${itemUrl}" target="_blank" rel="noopener noreferrer" class="text-blue-600 hover:underline font-medium">
                             記事を開く ↗
                           </a>
