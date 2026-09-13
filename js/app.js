@@ -24,6 +24,7 @@ const activeSitesEl = document.getElementById('stat-active-sites');
 const errorSitesEl = document.getElementById('stat-error-sites');
 const todayNewEl = document.getElementById('stat-today-new');
 const todayUpdatedEl = document.getElementById('stat-today-updated');
+const todayDeletedEl = document.getElementById('stat-today-deleted');
 const lastSyncTimeEl = document.getElementById('last-sync-time');
 const refreshBtn = document.getElementById('btn-refresh');
 const searchInput = document.getElementById('search-input');
@@ -153,6 +154,7 @@ function updateStats() {
   let errorCount = 0;
   let todayNew = 0;
   let todayUpdated = 0;
+  let todayDeleted = 0;
 
   sites.forEach(site => {
     const st = siteStatuses[site.id];
@@ -160,6 +162,7 @@ function updateStats() {
       activeCount++;
       todayNew += (st.data.recent_new_count || 0);
       todayUpdated += (st.data.recent_updated_count || 0);
+      todayDeleted += (st.data.recent_deleted_count || 0);
     } else if (st && st.status === 'error') {
       errorCount++;
     }
@@ -178,6 +181,9 @@ function updateStats() {
   todayNewEl.textContent = `${todayNew}件`;
   if (todayUpdatedEl) {
     todayUpdatedEl.textContent = `${todayUpdated}件`;
+  }
+  if (todayDeletedEl) {
+    todayDeletedEl.textContent = `${todayDeleted}件`;
   }
 }
 
