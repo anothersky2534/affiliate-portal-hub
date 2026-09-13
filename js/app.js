@@ -213,19 +213,23 @@ function renderCards() {
     const totalItems = data ? data.total_items : '--';
     const recentNew = data ? (data.recent_new_count || 0) : 0;
     const recentUpdated = data ? (data.recent_updated_count || 0) : 0;
+    const recentDeleted = data ? (data.recent_deleted_count || 0) : 0;
     const rawRecentItems = (data && data.recent_items) ? data.recent_items : [];
     
-    // Separate new vs updated articles
-    const hasExplicitActions = rawRecentItems.some(i => i.action === 'new' || i.action === 'updated');
+    // Separate new vs updated vs deleted articles
+    const hasExplicitActions = rawRecentItems.some(i => i.action === 'new' || i.action === 'updated' || i.action === 'deleted');
     let newArticles = [];
     let updatedArticles = [];
+    let deletedArticles = [];
 
     if (hasExplicitActions) {
       newArticles = rawRecentItems.filter(i => i.action === 'new');
       updatedArticles = rawRecentItems.filter(i => i.action === 'updated');
+      deletedArticles = rawRecentItems.filter(i => i.action === 'deleted');
     } else {
       newArticles = recentNew > 0 ? rawRecentItems.slice(0, recentNew) : [];
       updatedArticles = rawRecentItems.slice(newArticles.length);
+      deletedArticles = [];
     }
 
     const isExpanded = expandedSites.has(site.id);
@@ -267,23 +271,25 @@ function renderCards() {
               ` : ''}
             </div>
 
-            <!-- Top-Right: Total Articles & New / Updated Counts -->
+            <!-- Top-Right: Total Articles & Counts -->
             <div class="flex items-center gap-3.5 text-xs whitespace-nowrap">
               <div class="flex items-center gap-1">
-                <span class="text-gray-400 text-[11px]">総記事:</span>
+                <span class="text-gray-400 text-[11px]">記事数:</span>
                 <span class="font-bold text-gray-900 text-sm">${totalItems}</span>
                 <span class="text-gray-400 text-[11px]">件</span>
               </div>
 
               <div class="flex items-center gap-2">
                 <div class="flex items-center gap-1">
-                  <span class="text-gray-400 text-[11px]">新規:</span>
-                  <span class="font-bold text-sm ${recentNew > 0 ? 'text-amber-600' : 'text-gray-400'}">${recentNew > 0 ? `+${recentNew}件` : '0件'}</span>
+                  <span class="text-gray-400 text-[11px]">新着:</span>
+                  <span class="font-bold text-sm ${recentNew > 0 ? 'text-amber-600' : 'text-gray-500'} font-mono">${recentNew}件</span>
                 </div>
-                <div class="flex items-center gap-1">
-                  <span class="text-gray-400 text-[11px]">更新:</span>
-                  <span class="font-bold text-sm ${recentUpdated > 0 ? 'text-blue-600' : 'text-gray-400'} font-mono">${recentUpdated > 0 ? `${recentUpdated}件` : '0件'}</span>
-                </div>
+                ${recentDeleted > 0 ? `
+                  <div class="flex items-center gap-1">
+                    <span class="text-gray-400 text-[11px]">削除:</span>
+                    <span class="font-bold text-sm text-gray-600 font-mono">${recentDeleted}件</span>
+                  </div>
+                ` : ''}
               </div>
             </div>
 
@@ -302,7 +308,7 @@ function renderCards() {
               </div>
             </div>
 
-            <!-- Bottom-Right: Action Buttons (Left edge exactly matches Articles above) -->
+            <!-- Bottom-Right: Action Buttons -->
             <div class="flex items-center gap-1.5 whitespace-nowrap" onclick="event.stopPropagation()">
               <a href="${site.siteUrl}" target="_blank" rel="noopener noreferrer" class="px-2.5 py-1 text-gray-700 bg-white border border-gray-300 rounded hover:bg-gray-50 text-xs font-medium">
                 サイトを開く
@@ -326,33 +332,31 @@ function renderCards() {
 
         </div>
 
-        <!-- Expanded Accordion: Clearly Distinguish Newly Created vs Updated Articles -->
+        <!-- Expanded Accordion: 3 Simple Clean Boxes -->
         ${isExpanded ? `
           <div class="border-t border-gray-200 bg-gray-50/50 p-4 space-y-4">
             
-            <!-- 1. 新規制作された記事 -->
+            <!-- 1. 新規作成された記事 -->
             <div class="space-y-2">
               <div class="flex items-center justify-between text-xs text-gray-700 pb-1.5 border-b border-gray-200/80">
-                <span class="font-bold flex items-center gap-1.5">
-                  <span class="inline-block w-2 h-2 rounded-full ${recentNew > 0 ? 'bg-amber-500' : 'bg-gray-300'}"></span>
-                  <span>新規制作された記事</span>
-                  <span class="text-[11px] font-bold ${recentNew > 0 ? 'text-amber-600' : 'text-gray-400'} font-mono">(${recentNew}件)</span>
+                <span class="font-bold">
+                  本日自動追加された新着記事 (${recentNew}件)
                 </span>
-                ${newArticles.length > 0 ? `<span class="text-[11px] text-gray-400">クリックで生成された記事を開く</span>` : ''}
+                ${newArticles.length > 0 ? `<span class="text-[11px] text-gray-400">クリックで生成された記事ページを開く</span>` : ''}
               </div>
 
               ${newArticles.length === 0 ? `
-                <div class="text-xs text-gray-400 py-3 px-3.5 bg-white rounded border border-gray-200">
-                  今回の自動更新で新規作成された記事はありません（新規 0件）
+                <div class="text-xs text-gray-400 py-3 px-3.5 bg-white rounded border border-gray-200 text-center sm:text-left">
+                  本日の自動更新で新しく追加された記事はありません（新着 0件）
                 </div>
               ` : `
                 <div class="divide-y divide-gray-100 bg-white rounded border border-gray-200 overflow-hidden">
                   ${newArticles.map((item, idx) => {
                     const itemUrl = `${site.siteUrl.replace(/\/+$/, '')}/reviews/${item.item_id}.html`;
                     return `
-                      <div class="p-2.5 hover:bg-amber-50/25 transition flex items-center justify-between gap-3 text-xs">
+                      <div class="p-2.5 hover:bg-gray-50 transition flex items-center justify-between gap-3 text-xs">
                         <div class="flex items-center gap-2 min-w-0 flex-1">
-                          <span class="text-amber-600 font-mono text-[11px] w-6 flex-shrink-0 text-right tabular-nums font-bold">${idx + 1}.</span>
+                          <span class="text-gray-400 font-mono text-[11px] w-6 flex-shrink-0 text-right tabular-nums">${idx + 1}.</span>
                           ${item.item_id ? `<span class="text-[11px] text-gray-400 font-mono whitespace-nowrap flex-shrink-0">[${item.item_id}]</span>` : ''}
                           <a href="${itemUrl}" target="_blank" rel="noopener noreferrer" class="font-medium text-gray-900 hover:text-blue-600 truncate" title="${item.title}">
                             ${item.title}
@@ -360,9 +364,7 @@ function renderCards() {
                         </div>
 
                         <div class="flex items-center gap-3 whitespace-nowrap text-gray-500 text-[11px]">
-                          ${item.date ? `<span class="text-gray-400 font-mono text-[10px]">${item.date}</span>` : ''}
                           ${item.price ? `<span>${item.price}</span>` : ''}
-                          ${item.rating ? `<span class="text-amber-600 font-medium">★${item.rating}</span>` : ''}
                           <a href="${itemUrl}" target="_blank" rel="noopener noreferrer" class="text-blue-600 hover:underline font-medium">
                             記事を開く ↗
                           </a>
@@ -374,27 +376,25 @@ function renderCards() {
               `}
             </div>
 
-            <!-- 2. 既存で更新・再生成された記事 -->
+            <!-- 2. 既存で更新された記事 -->
             <div class="space-y-2 pt-1">
               <div class="flex items-center justify-between text-xs text-gray-700 pb-1.5 border-b border-gray-200/80">
-                <span class="font-bold flex items-center gap-1.5">
-                  <span class="inline-block w-2 h-2 rounded-full ${recentUpdated > 0 ? 'bg-blue-500' : 'bg-gray-300'}"></span>
-                  <span>既存で更新された記事</span>
-                  <span class="text-[11px] font-bold ${recentUpdated > 0 ? 'text-blue-600' : 'text-gray-400'} font-mono">(${recentUpdated}件)</span>
+                <span class="font-bold">
+                  本日自動更新された記事 (${recentUpdated}件)
                 </span>
                 ${updatedArticles.length > 0 ? `<span class="text-[11px] text-gray-400">価格・順位・レビュー等の最新化</span>` : ''}
               </div>
 
               ${updatedArticles.length === 0 ? `
-                <div class="text-xs text-gray-400 py-3 px-3.5 bg-white rounded border border-gray-200">
-                  今回の自動更新で更新された既存記事はありません（更新 0件）
+                <div class="text-xs text-gray-400 py-3 px-3.5 bg-white rounded border border-gray-200 text-center sm:text-left">
+                  本日の自動更新で更新された記事はありません（更新 0件）
                 </div>
               ` : `
                 <div class="divide-y divide-gray-100 bg-white rounded border border-gray-200 overflow-hidden">
                   ${updatedArticles.slice(0, 20).map((item, idx) => {
                     const itemUrl = `${site.siteUrl.replace(/\/+$/, '')}/reviews/${item.item_id}.html`;
                     return `
-                      <div class="p-2.5 hover:bg-blue-50/20 transition flex items-center justify-between gap-3 text-xs">
+                      <div class="p-2.5 hover:bg-gray-50 transition flex items-center justify-between gap-3 text-xs">
                         <div class="flex items-center gap-2 min-w-0 flex-1">
                           <span class="text-gray-400 font-mono text-[11px] w-6 flex-shrink-0 text-right tabular-nums">${idx + 1}.</span>
                           ${item.item_id ? `<span class="text-[11px] text-gray-400 font-mono whitespace-nowrap flex-shrink-0">[${item.item_id}]</span>` : ''}
@@ -404,12 +404,45 @@ function renderCards() {
                         </div>
 
                         <div class="flex items-center gap-3 whitespace-nowrap text-gray-500 text-[11px]">
-                          ${item.date ? `<span class="text-gray-400 font-mono text-[10px]">${item.date}</span>` : ''}
                           ${item.price ? `<span>${item.price}</span>` : ''}
-                          ${item.rating ? `<span class="text-amber-600 font-medium">★${item.rating}</span>` : ''}
                           <a href="${itemUrl}" target="_blank" rel="noopener noreferrer" class="text-blue-600 hover:underline font-medium">
                             記事を開く ↗
                           </a>
+                        </div>
+                      </div>
+                    `;
+                  }).join('')}
+                </div>
+              `}
+            </div>
+
+            <!-- 3. 本日削除された記事 (リンクなし・タイトルのみ) -->
+            <div class="space-y-2 pt-1">
+              <div class="flex items-center justify-between text-xs text-gray-700 pb-1.5 border-b border-gray-200/80">
+                <span class="font-bold">
+                  本日削除された記事 (${recentDeleted}件)
+                </span>
+                ${deletedArticles.length > 0 ? `<span class="text-[11px] text-gray-400">販売終了検知による削除</span>` : ''}
+              </div>
+
+              ${deletedArticles.length === 0 ? `
+                <div class="text-xs text-gray-400 py-3 px-3.5 bg-white rounded border border-gray-200 text-center sm:text-left">
+                  本日の自動更新で削除された記事はありません（削除 0件）
+                </div>
+              ` : `
+                <div class="divide-y divide-gray-100 bg-white rounded border border-gray-200 overflow-hidden">
+                  ${deletedArticles.map((item, idx) => {
+                    return `
+                      <div class="p-2.5 bg-white flex items-center justify-between gap-3 text-xs">
+                        <div class="flex items-center gap-2 min-w-0 flex-1">
+                          <span class="text-gray-400 font-mono text-[11px] w-6 flex-shrink-0 text-right tabular-nums">${idx + 1}.</span>
+                          ${item.item_id ? `<span class="text-[11px] text-gray-400 font-mono whitespace-nowrap flex-shrink-0">[${item.item_id}]</span>` : ''}
+                          <span class="text-gray-700 truncate select-text" title="${item.title}">
+                            ${item.title}
+                          </span>
+                        </div>
+                        <div class="whitespace-nowrap text-gray-400 text-[11px]">
+                          販売終了
                         </div>
                       </div>
                     `;
