@@ -23,6 +23,7 @@ const totalSitesEl = document.getElementById('stat-total-sites');
 const activeSitesEl = document.getElementById('stat-active-sites');
 const errorSitesEl = document.getElementById('stat-error-sites');
 const todayNewEl = document.getElementById('stat-today-new');
+const todayUpdatedEl = document.getElementById('stat-today-updated');
 const lastSyncTimeEl = document.getElementById('last-sync-time');
 const refreshBtn = document.getElementById('btn-refresh');
 const searchInput = document.getElementById('search-input');
@@ -151,12 +152,14 @@ function updateStats() {
   let activeCount = 0;
   let errorCount = 0;
   let todayNew = 0;
+  let todayUpdated = 0;
 
   sites.forEach(site => {
     const st = siteStatuses[site.id];
     if (st && st.status === 'operational' && st.data) {
       activeCount++;
       todayNew += (st.data.recent_new_count || 0);
+      todayUpdated += (st.data.recent_updated_count || 0);
     } else if (st && st.status === 'error') {
       errorCount++;
     }
@@ -173,6 +176,9 @@ function updateStats() {
   }
 
   todayNewEl.textContent = `+${todayNew}`;
+  if (todayUpdatedEl) {
+    todayUpdatedEl.textContent = `${todayUpdated}件`;
+  }
 }
 
 function toggleExpand(siteId) {
