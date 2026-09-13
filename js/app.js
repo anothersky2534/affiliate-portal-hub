@@ -206,10 +206,22 @@ function renderCards() {
     const lastUpdated = data ? data.last_updated : '取得失敗';
     const totalItems = data ? data.total_items : '--';
     const recentNew = data ? (data.recent_new_count || 0) : 0;
+    const recentUpdated = data ? (data.recent_updated_count || 0) : 0;
     const rawRecentItems = (data && data.recent_items) ? data.recent_items : [];
     
-    // Only show true new items if recent_new_count > 0, otherwise show fallback list
-    const newItemsOnly = recentNew > 0 ? rawRecentItems.slice(0, recentNew) : [];
+    // Separate new vs updated articles
+    const hasExplicitActions = rawRecentItems.some(i => i.action === 'new' || i.action === 'updated');
+    let newArticles = [];
+    let updatedArticles = [];
+
+    if (hasExplicitActions) {
+      newArticles = rawRecentItems.filter(i => i.action === 'new');
+      updatedArticles = rawRecentItems.filter(i => i.action === 'updated');
+    } else {
+      newArticles = recentNew > 0 ? rawRecentItems.slice(0, recentNew) : [];
+      updatedArticles = rawRecentItems.slice(newArticles.length);
+    }
+
     const isExpanded = expandedSites.has(site.id);
 
     return `
@@ -249,17 +261,25 @@ function renderCards() {
               ` : ''}
             </div>
 
-            <!-- Top-Right: Total Articles & New Count (Left aligned with action buttons below) -->
-            <div class="flex items-center gap-4 text-xs whitespace-nowrap">
-              <div class="flex items-center gap-1.5">
-                <span class="text-gray-400 text-[11px]">記事数:</span>
+            <!-- Top-Right: Total Articles & New / Updated Counts -->
+            <div class="flex items-center gap-3.5 text-xs whitespace-nowrap">
+              <div class="flex items-center gap-1">
+                <span class="text-gray-400 text-[11px]">総記事:</span>
                 <span class="font-bold text-gray-900 text-sm">${totalItems}</span>
                 <span class="text-gray-400 text-[11px]">件</span>
               </div>
 
-              <div class="flex items-center gap-1.5">
-                <span class="text-gray-400 text-[11px]">新着:</span>
-                <span class="font-bold text-sm ${recentNew > 0 ? 'text-amber-600' : 'text-gray-400'}">${recentNew > 0 ? `+${recentNew}件` : '0件'}</span>
+              <div class="flex items-center gap-2">
+                <div class="flex items-center gap-1">
+                  <span class="text-gray-400 text-[11px]">新規:</span>
+                  <span class="font-bold text-sm ${recentNew > 0 ? 'text-amber-600' : 'text-gray-400'}">${recentNew > 0 ? `+${recentNew}件` : '0件'}</span>
+                </div>
+                ${(recentUpdated > 0 || updatedArticles.length > 0) ? `
+                  <div class="flex items-center gap-1">
+                    <span class="text-gray-400 text-[11px]">更新:</span>
+                    <span class="font-bold text-sm text-blue-600 font-mono">${recentUpdated || updatedArticles.length}件</span>
+                  </div>
+                ` : ''}
               </div>
             </div>
 
@@ -302,48 +322,96 @@ function renderCards() {
 
         </div>
 
-        <!-- Expanded Accordion: Show ONLY Newly Added Articles -->
+        <!-- Expanded Accordion: Clearly Distinguish Newly Created vs Updated Articles -->
         ${isExpanded ? `
-          <div class="border-t border-gray-200 bg-gray-50/50 p-4 space-y-2">
-            <div class="flex items-center justify-between text-xs text-gray-700 pb-1.5 border-b border-gray-200/80">
-              <span class="font-bold flex items-center gap-1.5">
-                <span>本日自動追加された新着記事</span>
-                <span class="text-[11px] font-bold ${recentNew > 0 ? 'text-amber-600' : 'text-gray-500'} font-mono">(${recentNew}件)</span>
-              </span>
-              <span class="text-[11px] text-gray-400">クリックで生成された記事ページを開く</span>
+          <div class="border-t border-gray-200 bg-gray-50/50 p-4 space-y-4">
+            
+            <!-- 1. 新規制作された記事 -->
+            <div class="space-y-2">
+              <div class="flex items-center justify-between text-xs text-gray-700 pb-1.5 border-b border-gray-200/80">
+                <span class="font-bold flex items-center gap-1.5">
+                  <span class="inline-block w-2 h-2 rounded-full ${recentNew > 0 ? 'bg-amber-500' : 'bg-gray-300'}"></span>
+                  <span>新規制作された記事</span>
+                  <span class="text-[11px] font-bold ${recentNew > 0 ? 'text-amber-600' : 'text-gray-400'} font-mono">(${recentNew}件)</span>
+                </span>
+                ${newArticles.length > 0 ? `<span class="text-[11px] text-gray-400">クリックで生成された記事を開く</span>` : ''}
+              </div>
+
+              ${newArticles.length === 0 ? `
+                <div class="text-xs text-gray-400 py-3 px-3.5 bg-white rounded border border-gray-200">
+                  今回の自動更新で新規作成された記事はありません（新規 0件）
+                </div>
+              ` : `
+                <div class="divide-y divide-gray-100 bg-white rounded border border-gray-200 overflow-hidden">
+                  ${newArticles.map((item, idx) => {
+                    const itemUrl = `${site.siteUrl.replace(/\/+$/, '')}/reviews/${item.item_id}.html`;
+                    return `
+                      <div class="p-2.5 hover:bg-amber-50/25 transition flex items-center justify-between gap-3 text-xs">
+                        <div class="flex items-center gap-2 min-w-0 flex-1">
+                          <span class="text-amber-600 font-mono text-[11px] w-5 text-right font-bold">${idx + 1}.</span>
+                          <span class="text-[10px] px-1.5 py-0.5 bg-amber-50 text-amber-700 border border-amber-200 rounded font-bold whitespace-nowrap">新規</span>
+                          ${item.item_id ? `<span class="text-[11px] text-gray-400 font-mono whitespace-nowrap">[${item.item_id}]</span>` : ''}
+                          <a href="${itemUrl}" target="_blank" rel="noopener noreferrer" class="font-medium text-gray-900 hover:text-blue-600 truncate" title="${item.title}">
+                            ${item.title}
+                          </a>
+                        </div>
+
+                        <div class="flex items-center gap-3 whitespace-nowrap text-gray-500 text-[11px]">
+                          ${item.date ? `<span class="text-gray-400 font-mono text-[10px]">${item.date}</span>` : ''}
+                          ${item.price ? `<span>${item.price}</span>` : ''}
+                          ${item.rating ? `<span class="text-amber-600 font-medium">★${item.rating}</span>` : ''}
+                          <a href="${itemUrl}" target="_blank" rel="noopener noreferrer" class="text-blue-600 hover:underline font-medium">
+                            記事を開く ↗
+                          </a>
+                        </div>
+                      </div>
+                    `;
+                  }).join('')}
+                </div>
+              `}
             </div>
 
-            ${newItemsOnly.length === 0 ? `
-              <div class="text-xs text-gray-400 py-4 text-center bg-white rounded border border-gray-200">
-                本日の自動更新で新しく追加された記事はありません（新着 0件）
-              </div>
-            ` : `
-              <div class="divide-y divide-gray-100 bg-white rounded border border-gray-200 overflow-hidden">
-                ${newItemsOnly.map((item, idx) => {
-                  const itemUrl = `${site.siteUrl.replace(/\/+$/, '')}/reviews/${item.item_id}.html`;
-                  return `
-                    <div class="p-2.5 hover:bg-gray-50 transition flex items-center justify-between gap-3 text-xs">
-                      <div class="flex items-center gap-2 min-w-0 flex-1">
-                        <span class="text-gray-400 font-mono text-[11px] w-5 text-right">${idx + 1}.</span>
-                        ${item.item_id ? `<span class="text-[11px] text-gray-400 font-mono whitespace-nowrap">[${item.item_id}]</span>` : ''}
-                        <a href="${itemUrl}" target="_blank" rel="noopener noreferrer" class="font-medium text-gray-900 hover:text-blue-600 truncate" title="${item.title}">
-                          ${item.title}
-                        </a>
-                      </div>
+            <!-- 2. 既存で更新・再生成された記事 -->
+            ${(updatedArticles.length > 0 || recentUpdated > 0) ? `
+              <div class="space-y-2 pt-1">
+                <div class="flex items-center justify-between text-xs text-gray-700 pb-1.5 border-b border-gray-200/80">
+                  <span class="font-bold flex items-center gap-1.5">
+                    <span class="inline-block w-2 h-2 rounded-full bg-blue-500"></span>
+                    <span>既存で更新された記事</span>
+                    <span class="text-[11px] font-bold text-blue-600 font-mono">(${recentUpdated || updatedArticles.length}件)</span>
+                  </span>
+                  <span class="text-[11px] text-gray-400">価格・順位・レビュー等の最新化</span>
+                </div>
 
-                      <div class="flex items-center gap-3 whitespace-nowrap text-gray-500 text-[11px]">
-                        ${item.date ? `<span class="text-gray-400 font-mono text-[10px]">${item.date}</span>` : ''}
-                        ${item.price ? `<span>${item.price}</span>` : ''}
-                        ${item.rating ? `<span class="text-amber-600 font-medium">★${item.rating}</span>` : ''}
-                        <a href="${itemUrl}" target="_blank" rel="noopener noreferrer" class="text-blue-600 hover:underline font-medium">
-                          記事を開く ↗
-                        </a>
+                <div class="divide-y divide-gray-100 bg-white rounded border border-gray-200 overflow-hidden">
+                  ${updatedArticles.slice(0, 20).map((item, idx) => {
+                    const itemUrl = `${site.siteUrl.replace(/\/+$/, '')}/reviews/${item.item_id}.html`;
+                    return `
+                      <div class="p-2.5 hover:bg-blue-50/20 transition flex items-center justify-between gap-3 text-xs">
+                        <div class="flex items-center gap-2 min-w-0 flex-1">
+                          <span class="text-gray-400 font-mono text-[11px] w-5 text-right">${idx + 1}.</span>
+                          <span class="text-[10px] px-1.5 py-0.5 bg-blue-50 text-blue-700 border border-blue-200 rounded font-medium whitespace-nowrap">更新</span>
+                          ${item.item_id ? `<span class="text-[11px] text-gray-400 font-mono whitespace-nowrap">[${item.item_id}]</span>` : ''}
+                          <a href="${itemUrl}" target="_blank" rel="noopener noreferrer" class="font-medium text-gray-800 hover:text-blue-600 truncate" title="${item.title}">
+                            ${item.title}
+                          </a>
+                        </div>
+
+                        <div class="flex items-center gap-3 whitespace-nowrap text-gray-500 text-[11px]">
+                          ${item.date ? `<span class="text-gray-400 font-mono text-[10px]">${item.date}</span>` : ''}
+                          ${item.price ? `<span>${item.price}</span>` : ''}
+                          ${item.rating ? `<span class="text-amber-600 font-medium">★${item.rating}</span>` : ''}
+                          <a href="${itemUrl}" target="_blank" rel="noopener noreferrer" class="text-blue-600 hover:underline font-medium">
+                            記事を開く ↗
+                          </a>
+                        </div>
                       </div>
-                    </div>
-                  `;
-                }).join('')}
+                    `;
+                  }).join('')}
+                </div>
               </div>
-            `}
+            ` : ''}
+
           </div>
         ` : ''}
 

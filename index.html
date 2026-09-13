@@ -111,16 +111,18 @@
   "site_name": "サイトの正式タイトル",
   "site_url": "サイトの公開URL",
   "status": "operational",
-  "last_updated": "2026/09/12 04:10:00 (日本時間秒まで)",
+  "last_updated": "2026/09/13 13:00:00 (日本時間秒まで)",
   "total_items": 総記事数・作品数,
-  "recent_new_count": 直近で追加された作品数,
+  "recent_new_count": 直近で新規作成された記事数,
+  "recent_updated_count": 既存更新された記事数,
   "recent_items": [
     {
       "item_id": "作品ID",
       "title": "作品タイトル",
       "price": "販売価格",
       "rating": "4.5",
-      "category": "カテゴリ名"
+      "category": "カテゴリ名",
+      "action": "new または updated"
     }
   ]
 }</div>
@@ -248,8 +250,8 @@
     </div>
   </div>
 
-  <script src="js/sites_config.js?v=14"></script>
-  <script src="js/app.js?v=14"></script>
+  <script src="js/sites_config.js?v=15"></script>
+  <script src="js/app.js?v=15"></script>
   <script>
     function toggleGuide() {
       const content = document.getElementById('guide-content');
