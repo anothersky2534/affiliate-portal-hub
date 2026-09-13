@@ -349,7 +349,6 @@ function renderCards() {
                       <div class="p-2.5 hover:bg-amber-50/25 transition flex items-center justify-between gap-3 text-xs">
                         <div class="flex items-center gap-2 min-w-0 flex-1">
                           <span class="text-amber-600 font-mono text-[11px] w-5 text-right font-bold">${idx + 1}.</span>
-                          <span class="text-[10px] px-1.5 py-0.5 bg-amber-50 text-amber-700 border border-amber-200 rounded font-bold whitespace-nowrap">新規</span>
                           ${item.item_id ? `<span class="text-[11px] text-gray-400 font-mono whitespace-nowrap">[${item.item_id}]</span>` : ''}
                           <a href="${itemUrl}" target="_blank" rel="noopener noreferrer" class="font-medium text-gray-900 hover:text-blue-600 truncate" title="${item.title}">
                             ${item.title}
@@ -390,7 +389,6 @@ function renderCards() {
                       <div class="p-2.5 hover:bg-blue-50/20 transition flex items-center justify-between gap-3 text-xs">
                         <div class="flex items-center gap-2 min-w-0 flex-1">
                           <span class="text-gray-400 font-mono text-[11px] w-5 text-right">${idx + 1}.</span>
-                          <span class="text-[10px] px-1.5 py-0.5 bg-blue-50 text-blue-700 border border-blue-200 rounded font-medium whitespace-nowrap">更新</span>
                           ${item.item_id ? `<span class="text-[11px] text-gray-400 font-mono whitespace-nowrap">[${item.item_id}]</span>` : ''}
                           <a href="${itemUrl}" target="_blank" rel="noopener noreferrer" class="font-medium text-gray-800 hover:text-blue-600 truncate" title="${item.title}">
                             ${item.title}
