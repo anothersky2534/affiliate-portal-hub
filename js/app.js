@@ -372,7 +372,7 @@ function renderCards() {
                         </div>
 
                         <div class="flex items-center gap-3 whitespace-nowrap text-gray-500 text-[11px]">
-                          ${item.price ? `<span>${item.price}</span>` : ''}
+                          ${item.reason ? `<span>${item.reason}</span>` : ''}
                           <a href="${itemUrl}" target="_blank" rel="noopener noreferrer" class="text-blue-600 hover:underline font-medium">
                             記事を開く ↗
                           </a>
