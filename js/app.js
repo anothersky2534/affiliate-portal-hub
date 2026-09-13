@@ -175,7 +175,7 @@ function updateStats() {
     errorSitesEl.className = "text-2xl font-bold text-gray-900 mt-1";
   }
 
-  todayNewEl.textContent = `+${todayNew}`;
+  todayNewEl.textContent = `${todayNew}件`;
   if (todayUpdatedEl) {
     todayUpdatedEl.textContent = `${todayUpdated}件`;
   }
