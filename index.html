@@ -113,6 +113,7 @@
 
 【status.json 出力仕様】
 - 出力先: 公開フォルダ直下（例: output/site/status.json）
+- 仕様: 1日数回バッチが走っても夜12時（24:00 JST）を超えるまでは「本日（JST）」の新着数・削除数を累積維持して出力してください（日付が変わったらリセット）。
 - 出力内容:
 {
   "site_id": "サイトの一意なID",
@@ -121,8 +122,9 @@
   "status": "operational",
   "last_updated": "2026/09/13 13:00:00 (日本時間秒まで)",
   "total_items": 総記事数・作品数,
-  "recent_new_count": 直近で新規作成された記事数,
-  "recent_updated_count": 既存更新された記事数,
+  "recent_new_count": 本日新規作成された記事数(日次累計),
+  "recent_updated_count": 本日更新された記事数,
+  "recent_deleted_count": 本日削除された記事数(日次累計),
   "recent_items": [
     {
       "item_id": "作品ID",
@@ -130,7 +132,7 @@
       "price": "販売価格",
       "rating": "4.5",
       "category": "カテゴリ名",
-      "action": "new または updated"
+      "action": "new / updated / deleted"
     }
   ]
 }</div>
