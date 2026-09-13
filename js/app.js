@@ -339,8 +339,10 @@ function renderCards() {
             <!-- 1. 新規作成された記事 -->
             <div class="space-y-2">
               <div class="flex items-center justify-between text-xs text-gray-700 pb-1.5 border-b border-gray-200/80">
-                <span class="font-bold">
-                  本日自動追加された新着記事 (${recentNew}件)
+                <span class="font-bold flex items-center gap-1.5">
+                  <span class="inline-block w-2 h-2 rounded-full ${recentNew > 0 ? 'bg-amber-500' : 'bg-gray-300'}"></span>
+                  <span>本日自動追加された新着記事</span>
+                  <span class="text-[11px] font-bold ${recentNew > 0 ? 'text-amber-600' : 'text-gray-400'} font-mono">(${recentNew}件)</span>
                 </span>
                 ${newArticles.length > 0 ? `<span class="text-[11px] text-gray-400">クリックで生成された記事ページを開く</span>` : ''}
               </div>
@@ -379,8 +381,10 @@ function renderCards() {
             <!-- 2. 既存で更新された記事 -->
             <div class="space-y-2 pt-1">
               <div class="flex items-center justify-between text-xs text-gray-700 pb-1.5 border-b border-gray-200/80">
-                <span class="font-bold">
-                  本日自動更新された記事 (${recentUpdated}件)
+                <span class="font-bold flex items-center gap-1.5">
+                  <span class="inline-block w-2 h-2 rounded-full ${recentUpdated > 0 ? 'bg-blue-500' : 'bg-gray-300'}"></span>
+                  <span>本日自動更新された記事</span>
+                  <span class="text-[11px] font-bold ${recentUpdated > 0 ? 'text-blue-600' : 'text-gray-400'} font-mono">(${recentUpdated}件)</span>
                 </span>
                 ${updatedArticles.length > 0 ? `<span class="text-[11px] text-gray-400">価格・順位・レビュー等の最新化</span>` : ''}
               </div>
@@ -419,8 +423,10 @@ function renderCards() {
             <!-- 3. 本日削除された記事 (リンクなし・タイトルのみ) -->
             <div class="space-y-2 pt-1">
               <div class="flex items-center justify-between text-xs text-gray-700 pb-1.5 border-b border-gray-200/80">
-                <span class="font-bold">
-                  本日削除された記事 (${recentDeleted}件)
+                <span class="font-bold flex items-center gap-1.5">
+                  <span class="inline-block w-2 h-2 rounded-full ${recentDeleted > 0 ? 'bg-red-500' : 'bg-gray-300'}"></span>
+                  <span>本日削除された記事</span>
+                  <span class="text-[11px] font-bold ${recentDeleted > 0 ? 'text-red-600' : 'text-gray-400'} font-mono">(${recentDeleted}件)</span>
                 </span>
                 ${deletedArticles.length > 0 ? `<span class="text-[11px] text-gray-400">販売終了検知による削除</span>` : ''}
               </div>
@@ -450,6 +456,7 @@ function renderCards() {
                 </div>
               `}
             </div>
+
 
           </div>
         ` : ''}
