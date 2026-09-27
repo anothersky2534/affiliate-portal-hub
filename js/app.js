@@ -71,6 +71,18 @@ function loadSites() {
   if (saved) {
     try {
       sites = JSON.parse(saved);
+      let hasMigration = false;
+      sites = sites.map(site => {
+        if (site.id === 'fc2-ranking-and-review' && site.statusUrl && site.statusUrl.includes('workers.dev')) {
+          site.siteUrl = 'https://fc2ranking.stream';
+          site.statusUrl = 'https://fc2ranking.stream/status.json';
+          hasMigration = true;
+        }
+        return site;
+      });
+      if (hasMigration) {
+        saveSites();
+      }
     } catch (e) {
       sites = [...DEFAULT_SITES];
     }
