@@ -293,7 +293,7 @@ function renderCards() {
                 <span class="text-gray-400 text-[11px]">件</span>
               </div>
 
-              <div class="flex items-center gap-2">
+              <div class="flex items-center gap-3">
                 <div class="flex items-center gap-1">
                   <span class="text-gray-400 text-[11px]">新着:</span>
                   <span class="font-bold text-sm ${recentNew > 0 ? 'text-amber-600' : 'text-gray-500'} font-mono">${recentNew}件</span>
@@ -306,9 +306,8 @@ function renderCards() {
                 ` : ''}
                 ${pendingReviewsCount > 0 ? `
                   <div class="flex items-center gap-1">
-                    <span class="text-amber-700 bg-amber-50 border border-amber-200 px-1.5 py-0.5 rounded text-[11px] font-bold">
-                      準備中: ${pendingReviewsCount}件
-                    </span>
+                    <span class="text-gray-400 text-[11px]">準備中:</span>
+                    <span class="font-bold text-sm text-gray-900 font-mono">${pendingReviewsCount}件</span>
                   </div>
                 ` : ''}
               </div>
