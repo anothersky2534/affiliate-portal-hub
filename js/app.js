@@ -1,5 +1,5 @@
 /**
- * Affiliate Portal Hub - Clean Accordion with True Newly Added Articles
+ * Affiliate Portal Hub - Clean Accordion with True Newly Added Articles & Review Queue
  */
 
 const DEFAULT_LINKS = [
@@ -25,6 +25,7 @@ const errorSitesEl = document.getElementById('stat-error-sites');
 const todayNewEl = document.getElementById('stat-today-new');
 const todayUpdatedEl = document.getElementById('stat-today-updated');
 const todayDeletedEl = document.getElementById('stat-today-deleted');
+const pendingReviewsEl = document.getElementById('stat-pending-reviews');
 const lastSyncTimeEl = document.getElementById('last-sync-time');
 const refreshBtn = document.getElementById('btn-refresh');
 const searchInput = document.getElementById('search-input');
@@ -155,6 +156,7 @@ function updateStats() {
   let todayNew = 0;
   let todayUpdated = 0;
   let todayDeleted = 0;
+  let totalPending = 0;
 
   sites.forEach(site => {
     const st = siteStatuses[site.id];
@@ -163,6 +165,7 @@ function updateStats() {
       todayNew += (st.data.recent_new_count || 0);
       todayUpdated += (st.data.recent_updated_count || 0);
       todayDeleted += (st.data.recent_deleted_count || 0);
+      totalPending += (st.data.pending_reviews_count || 0);
     } else if (st && st.status === 'error') {
       errorCount++;
     }
@@ -172,10 +175,10 @@ function updateStats() {
   
   if (errorCount > 0) {
     errorSitesEl.textContent = `${errorCount}件`;
-    errorSitesEl.className = "text-2xl font-bold text-red-600 mt-1";
+    errorSitesEl.className = "text-xl sm:text-2xl font-bold text-red-600 mt-1";
   } else {
     errorSitesEl.textContent = "0件";
-    errorSitesEl.className = "text-2xl font-bold text-gray-900 mt-1";
+    errorSitesEl.className = "text-xl sm:text-2xl font-bold text-gray-900 mt-1";
   }
 
   todayNewEl.textContent = `${todayNew}件`;
@@ -184,6 +187,9 @@ function updateStats() {
   }
   if (todayDeletedEl) {
     todayDeletedEl.textContent = `${todayDeleted}件`;
+  }
+  if (pendingReviewsEl) {
+    pendingReviewsEl.textContent = `${totalPending}件`;
   }
 }
 
@@ -220,6 +226,8 @@ function renderCards() {
     const recentNew = data ? (data.recent_new_count || 0) : 0;
     const recentUpdated = data ? (data.recent_updated_count || 0) : 0;
     const recentDeleted = data ? (data.recent_deleted_count || 0) : 0;
+    const pendingReviewsCount = data ? (data.pending_reviews_count || 0) : 0;
+    const pendingReviewItems = (data && data.pending_review_items) ? data.pending_review_items : [];
     const rawRecentItems = (data && data.recent_items) ? data.recent_items : [];
     
     // Separate new vs updated vs deleted articles
@@ -277,7 +285,7 @@ function renderCards() {
               ` : ''}
             </div>
 
-            <!-- Top-Right: Total Articles & Counts -->
+            <!-- Top-Right: Total Articles & New / Updated / Pending Counts -->
             <div class="flex items-center gap-3.5 text-xs whitespace-nowrap">
               <div class="flex items-center gap-1">
                 <span class="text-gray-400 text-[11px]">記事数:</span>
@@ -294,6 +302,13 @@ function renderCards() {
                   <div class="flex items-center gap-1">
                     <span class="text-gray-400 text-[11px]">削除:</span>
                     <span class="font-bold text-sm text-red-600 font-mono">${recentDeleted}件</span>
+                  </div>
+                ` : ''}
+                ${pendingReviewsCount > 0 ? `
+                  <div class="flex items-center gap-1">
+                    <span class="text-amber-700 bg-amber-50 border border-amber-200 px-1.5 py-0.5 rounded text-[11px] font-bold">
+                      準備中: ${pendingReviewsCount}件
+                    </span>
                   </div>
                 ` : ''}
               </div>
@@ -338,7 +353,7 @@ function renderCards() {
 
         </div>
 
-        <!-- Expanded Accordion: 3 Simple Clean Boxes -->
+        <!-- Expanded Accordion: Simple Clean Boxes -->
         ${isExpanded ? `
           <div class="border-t border-gray-200 bg-gray-50/50 p-4 space-y-4">
             
@@ -360,7 +375,7 @@ function renderCards() {
               ` : `
                 <div class="divide-y divide-gray-100 bg-white rounded border border-gray-200 overflow-hidden">
                   ${newArticles.map((item, idx) => {
-                    const itemUrl = `${site.siteUrl.replace(/\/+$/, '')}/reviews/${item.item_id}.html`;
+                    const itemUrl = item.review_url || `${site.siteUrl.replace(/\/+$/, '')}/reviews/${item.item_id}`;
                     const reasonLabel = item.reason || (item.is_new_release || (item.category && item.category.includes('新作')) ? '新作' : 'ランキング');
                     return `
                       <div class="p-2.5 hover:bg-gray-50 transition flex items-center justify-between gap-3 text-xs">
@@ -403,7 +418,7 @@ function renderCards() {
               ` : `
                 <div class="divide-y divide-gray-100 bg-white rounded border border-gray-200 overflow-hidden">
                   ${updatedArticles.slice(0, 20).map((item, idx) => {
-                    const itemUrl = `${site.siteUrl.replace(/\/+$/, '')}/reviews/${item.item_id}.html`;
+                    const itemUrl = item.review_url || `${site.siteUrl.replace(/\/+$/, '')}/reviews/${item.item_id}`;
                     return `
                       <div class="p-2.5 hover:bg-gray-50 transition flex items-center justify-between gap-3 text-xs">
                         <div class="flex items-center gap-2 min-w-0 flex-1">
@@ -427,43 +442,84 @@ function renderCards() {
               `}
             </div>
 
-            <!-- 3. 本日削除された記事 (リンクなし・タイトルのみ) -->
-            <div class="space-y-2 pt-1">
-              <div class="flex items-center justify-between text-xs text-gray-700 pb-1.5 border-b border-gray-200/80">
-                <span class="font-bold flex items-center gap-1.5">
-                  <span class="inline-block w-2 h-2 rounded-full ${recentDeleted > 0 ? 'bg-red-500' : 'bg-gray-300'}"></span>
-                  <span>本日削除された記事</span>
-                  <span class="text-[11px] font-bold ${recentDeleted > 0 ? 'text-red-600' : 'text-gray-400'} font-mono">(${recentDeleted}件)</span>
-                </span>
-                ${deletedArticles.length > 0 ? `<span class="text-[11px] text-gray-400">販売終了検知による削除</span>` : ''}
-              </div>
-
-              ${deletedArticles.length === 0 ? `
-                <div class="text-xs text-gray-400 py-3 px-3.5 bg-white rounded border border-gray-200 text-center sm:text-left">
-                  本日の自動更新で削除された記事はありません（削除 0件）
+            <!-- 3. 本日削除された記事 -->
+            ${(recentDeleted > 0 || deletedArticles.length > 0) ? `
+              <div class="space-y-2 pt-1">
+                <div class="flex items-center justify-between text-xs text-gray-700 pb-1.5 border-b border-gray-200/80">
+                  <span class="font-bold flex items-center gap-1.5">
+                    <span class="inline-block w-2 h-2 rounded-full ${recentDeleted > 0 ? 'bg-red-500' : 'bg-gray-300'}"></span>
+                    <span>本日削除された記事</span>
+                    <span class="text-[11px] font-bold ${recentDeleted > 0 ? 'text-red-600' : 'text-gray-400'} font-mono">(${recentDeleted}件)</span>
+                  </span>
+                  ${deletedArticles.length > 0 ? `<span class="text-[11px] text-gray-400">販売終了検知による削除</span>` : ''}
                 </div>
-              ` : `
-                <div class="divide-y divide-gray-100 bg-white rounded border border-gray-200 overflow-hidden">
-                  ${deletedArticles.map((item, idx) => {
-                    return `
-                      <div class="p-2.5 bg-white flex items-center justify-between gap-3 text-xs">
-                        <div class="flex items-center gap-2 min-w-0 flex-1">
-                          <span class="text-gray-400 font-mono text-[11px] w-6 flex-shrink-0 text-right tabular-nums">${idx + 1}.</span>
-                          ${item.item_id ? `<span class="text-[11px] text-gray-400 font-mono whitespace-nowrap flex-shrink-0">[${item.item_id}]</span>` : ''}
-                          <span class="text-gray-700 truncate select-text" title="${item.title}">
-                            ${item.title}
-                          </span>
+
+                ${deletedArticles.length === 0 ? `
+                  <div class="text-xs text-gray-400 py-3 px-3.5 bg-white rounded border border-gray-200 text-center sm:text-left">
+                    本日の自動更新で削除された記事はありません（削除 0件）
+                  </div>
+                ` : `
+                  <div class="divide-y divide-gray-100 bg-white rounded border border-gray-200 overflow-hidden">
+                    ${deletedArticles.map((item, idx) => {
+                      return `
+                        <div class="p-2.5 bg-white flex items-center justify-between gap-3 text-xs">
+                          <div class="flex items-center gap-2 min-w-0 flex-1">
+                            <span class="text-gray-400 font-mono text-[11px] w-6 flex-shrink-0 text-right tabular-nums">${idx + 1}.</span>
+                            ${item.item_id ? `<span class="text-[11px] text-gray-400 font-mono whitespace-nowrap flex-shrink-0">[${item.item_id}]</span>` : ''}
+                            <span class="text-gray-700 truncate select-text" title="${item.title}">
+                              ${item.title}
+                            </span>
+                          </div>
+                          <div class="whitespace-nowrap text-gray-400 text-[11px]">
+                            販売終了
+                          </div>
                         </div>
-                        <div class="whitespace-nowrap text-gray-400 text-[11px]">
-                          販売終了
+                      `;
+                    }).join('')}
+                  </div>
+                `}
+              </div>
+            ` : ''}
+
+            <!-- 4. レビュー準備中・要執筆記事 -->
+            ${pendingReviewsCount > 0 ? `
+              <div class="space-y-2 pt-1">
+                <div class="flex items-center justify-between text-xs text-gray-700 pb-1.5 border-b border-gray-200/80">
+                  <span class="font-bold flex items-center gap-1.5">
+                    <span class="inline-block w-2 h-2 rounded-full bg-amber-500"></span>
+                    <span>レビュー準備中の記事（要執筆・フォールバック中）</span>
+                    <span class="text-[11px] font-bold text-amber-600 font-mono">(${pendingReviewsCount}件)</span>
+                  </span>
+                  <span class="text-[11px] text-gray-400">クリックで個別ページを開く</span>
+                </div>
+
+                <div class="divide-y divide-gray-100 bg-white rounded border border-gray-200 overflow-hidden max-h-96 overflow-y-auto">
+                  ${pendingReviewItems.map((item, idx) => {
+                    const itemUrl = item.review_url || `${site.siteUrl.replace(/\/+$/, '')}/reviews/${item.item_id}`;
+                    return `
+                      <div class="p-2.5 hover:bg-amber-50/20 transition flex items-center justify-between gap-3 text-xs">
+                        <div class="flex items-center gap-2 min-w-0 flex-1">
+                          <span class="text-amber-700 font-mono text-[11px] w-7 flex-shrink-0 text-right tabular-nums font-bold">${idx + 1}.</span>
+                          ${item.item_id ? `<span class="text-[11px] text-gray-400 font-mono whitespace-nowrap flex-shrink-0">[${item.item_id}]</span>` : ''}
+                          <a href="${itemUrl}" target="_blank" rel="noopener noreferrer" class="font-medium text-gray-800 hover:text-blue-600 truncate" title="${item.title}">
+                            ${item.title}
+                          </a>
+                        </div>
+
+                        <div class="flex items-center gap-3 whitespace-nowrap text-gray-500 text-[11px]">
+                          ${item.creator ? `<span class="text-gray-400 text-[11px]">${item.creator}</span>` : ''}
+                          ${item.category ? `<span class="px-1.5 py-0.5 bg-gray-100 text-gray-600 rounded text-[10px] font-medium">${item.category}</span>` : ''}
+                          ${item.price ? `<span>${item.price}</span>` : ''}
+                          <a href="${itemUrl}" target="_blank" rel="noopener noreferrer" class="text-rose-600 hover:underline font-medium">
+                            確認・執筆 ↗
+                          </a>
                         </div>
                       </div>
                     `;
                   }).join('')}
                 </div>
-              `}
-            </div>
-
+              </div>
+            ` : ''}
 
           </div>
         ` : ''}
